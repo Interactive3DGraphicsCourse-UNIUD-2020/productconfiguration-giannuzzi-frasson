@@ -23,13 +23,22 @@
 			var scene = new THREE.Scene();
 			var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 			var renderer = new THREE.WebGLRenderer();
-			renderer.setSize( window.innerWidth, window.innerHeight );
-			renderer.setClearColor( 0xf0f0f0 );
+			renderer.setSize( window.innerWidth, window.innerHeight );			
 			document.body.appendChild( renderer.domElement );
+			//environment map
+			var path = 'textures/SwedishRoyalCastle/';
+			var format = '.png';
+			var textureCube = new THREE.CubeTextureLoader().load( [
+				path + 'px' + format, path + 'nx' + format,
+				path + 'py' + format, path + 'ny' + format,
+				path + 'pz' + format, path + 'nz' + format
+			] );
+			scene.background = textureCube;				
 			//carico oggetto
 			var loader = new THREE.OBJLoader();			
 			loader.load('models/maschera.obj',function ( object ) 
 			{
+				object.envMap = textureCube;
 				scene.add( object );
 			});
 			
