@@ -16,6 +16,7 @@
 		<script src="libs/three.min.js"></script>
 		<script src="libs/stats.min.js"></script>
 		<script src="libs/OBJLoader.js"></script>
+		<script src="libs/OrbitControls.js"></script>
 	</head>
 	<body>
 		
@@ -25,20 +26,21 @@
 			var renderer = new THREE.WebGLRenderer();
 			renderer.setSize( window.innerWidth, window.innerHeight );			
 			document.body.appendChild( renderer.domElement );
+			controls = new THREE.OrbitControls(camera);
 			//environment map
-			var path = 'textures/SwedishRoyalCastle/';
-			var format = '.png';
+			var path = 'textures/yokohama/';
+			var format = '.jpg';
 			var textureCube = new THREE.CubeTextureLoader().load( [
-				path + 'px' + format, path + 'nx' + format,
-				path + 'py' + format, path + 'ny' + format,
-				path + 'pz' + format, path + 'nz' + format
+				path + 'posx' + format, path + 'negx' + format,
+				path + 'posy' + format, path + 'negy' + format,
+				path + 'posz' + format, path + 'negz' + format
 			] );
 			scene.background = textureCube;				
 			//carico oggetto
 			var loader = new THREE.OBJLoader();			
-			loader.load('models/maschera.obj',function ( object ) 
+			loader.load('models/diesel.obj',function ( object ) 
 			{
-				object.envMap = textureCube;
+				object.envMap = textureCube;							
 				scene.add( object );
 			});
 			
@@ -46,7 +48,7 @@
 			stats.domElement.style.position = 'absolute';
 			stats.domElement.style.top = '0px';
 			document.body.appendChild( stats.domElement );
-			camera.position.z = 30;			
+			camera.position.z = 150;			
 			
 			function render() {
 				requestAnimationFrame(render);				
