@@ -37,11 +37,29 @@
 			] );
 			scene.background = textureCube;				
 			//carico oggetto
-			var loader = new THREE.OBJLoader();			
-			loader.load('models/diesel.obj',function ( object ) 
+			var loader = new THREE.OBJLoader();
+			var seduta;
+			var struttura;
+			var gambe;
+			var sedia = new THREE.Object3D()
+
+			loader.load('models/sedia_NEW.obj',function ( object ) 
 			{
-				object.envMap = textureCube;							
-				scene.add( object );
+				object.envMap = textureCube;
+				
+				gambe = object.children[2];
+				struttura = object.children[1];
+				seduta = object.children[0];
+				
+				seduta.material = new THREE.MeshBasicMaterial( { color: 0xff2200 } );
+				struttura.material = new THREE.MeshBasicMaterial( { color: 0xfffff } );
+				gambe.material = new THREE.MeshBasicMaterial( { color: 0xff2200 } );
+
+				sedia.add(struttura);
+				sedia.add(seduta);
+				sedia.add(gambe);
+				scene.add( sedia );
+				console.log(object);
 			});
 			
 			stats = new Stats();
