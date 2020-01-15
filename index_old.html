@@ -1,0 +1,80 @@
+<html>
+	<head>
+		<title>Assignment II</title>
+		<style>
+		body {
+			font-family: Monospace;
+			background-color: #f0f0f0;
+			margin: 0px;
+			overflow: hidden;
+		}		
+		canvas { 
+			width: 100%; 
+			height: 100%;
+		}
+		</style>
+		<script src="libs/three.min.js"></script>
+		<script src="libs/stats.min.js"></script>
+		<script src="libs/OBJLoader.js"></script>
+		<script src="libs/OrbitControls.js"></script>
+	</head>
+	<body>
+		
+		<script>
+			var scene = new THREE.Scene();
+			var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+			var renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );			
+			document.body.appendChild( renderer.domElement );
+			controls = new THREE.OrbitControls(camera);
+			//environment map
+			var path = 'textures/yokohama/';
+			var format = '.jpg';
+			var textureCube = new THREE.CubeTextureLoader().load( [
+				path + 'posx' + format, path + 'negx' + format,
+				path + 'posy' + format, path + 'negy' + format,
+				path + 'posz' + format, path + 'negz' + format
+			] );
+			scene.background = textureCube;				
+			//carico oggetto
+			var loader = new THREE.OBJLoader();
+			var seduta;
+			var struttura;
+			var gambe;
+			var sedia = new THREE.Object3D()
+
+			loader.load('models/sedia_NEW.obj',function ( object ) 
+			{
+				object.envMap = textureCube;
+				
+				gambe = object.children[2];
+				struttura = object.children[1];
+				seduta = object.children[0];
+				
+				seduta.material = new THREE.MeshBasicMaterial( { color: 0xff2200 } );
+				struttura.material = new THREE.MeshBasicMaterial( { color: 0xfffff } );
+				gambe.material = new THREE.MeshBasicMaterial( { color: 0xff2200 } );
+
+				sedia.add(struttura);
+				sedia.add(seduta);
+				sedia.add(gambe);
+				scene.add( sedia );
+				console.log(object);
+			});
+			
+			stats = new Stats();
+			stats.domElement.style.position = 'absolute';
+			stats.domElement.style.top = '0px';
+			document.body.appendChild( stats.domElement );
+			camera.position.z = 150;			
+			
+			function render() {
+				requestAnimationFrame(render);				
+				stats.update();				
+				renderer.render(scene, camera);
+			}
+			
+			render();
+		</script>
+	</body>
+</html>
