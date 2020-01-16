@@ -20,6 +20,7 @@
 
 <body>
 	<script src="libs/three.min.js"></script>
+	<script src="libs/dat.gui.min.js"></script>
 	<script src="libs/stats.min.js"></script>
 	<script src="libs/OBJLoader.js"></script>
 	<script src="libs/OrbitControls.js"></script>
@@ -88,7 +89,7 @@
 			red: 1.0,
 			green: 1.0,
 			blue: 1.0,
-			intensity: 1.5
+			intensity: 0.7
 		}
 		var cdiff = {
 			red: 0.7,
@@ -131,17 +132,19 @@
 		
 		//luce 1 (dx) 	
 		var light = new THREE.PointLight( 0xffffff );
-		light.position.set( 10.0, 10.0, 0.0).normalize();
+		light.position.set( 10.0, 10.0, 0.0);
 		scene.add(light);
 		//luce 2 (sx) 
 		var light2 = new THREE.PointLight( 0xffffff );
-		light2.position.set(10.0, 10.0, 0.0 ).normalize();
+		light2.position.set(10.0, 10.0, 0.0 );
 		scene.add(light2);
 		//luce 3 (top) 
 		var light3 = new THREE.PointLight( 0xffffff );
-		light3.position.set(0.0, 13.0, -7.0).normalize();
+		light3.position.set(0.0, 13.0, -7.0);
 		scene.add(light3);
-		
+		//light 4 
+		light4 = new THREE.AmbientLight( 0xffffff);
+    	scene.add(light4);
 
 		loader.load('models/sedia.obj', function (object) {
 			//object.envMap = textureCube;				
@@ -173,8 +176,8 @@
 			roughness.wrapS = roughness.wrapT = THREE.RepeatWrapping;
 			roughness.repeat.set(4, 4);			
 			//applicazione texture
-			seduta.material = new THREE.MeshPhongMaterial({ color: 0xbbbbbb , needsUpdate: true, envMap: scene.background });
-			struttura.material = new THREE.MeshPhongMaterial({ color: 0x333333 , needsUpdate: true, envMap: scene.background });
+			seduta.material = new THREE.MeshPhongMaterial({ map: texture , needsUpdate: true, envMap: scene.background, displacementMap: displacement, normalMap: normale, aoMap: ao, roughnessMap: roughness, displacementBias: -0.5, });		
+			struttura.material = new THREE.MeshPhongMaterial({ map: texture , needsUpdate: true, envMap: scene.background, displacementMap: displacement, normalMap: normale, aoMap: ao, roughnessMap: roughness, displacementBias: -0.5, });		
 			gambe.material = new THREE.MeshPhongMaterial({ map: texture , needsUpdate: true, envMap: scene.background, displacementMap: displacement, normalMap: normale, aoMap: ao, roughnessMap: roughness, displacementBias: -0.5, });			
 			console.log(seduta.material);
 			//fine test
@@ -187,6 +190,39 @@
 			gambe.material = ourMaterial;
 			*/
 
+			//GUI
+			const datGui  = new dat.GUI({ autoPlace: true });  
+			datGui.domElement.id = 'gui'       	
+			var settings = {
+				normalmap: true,
+				displacementmap: true,
+				occlusionmap: true,
+			};
+			datGui.add(settings, 'displacementmap').onChange(function (value) {	
+				if(settings.displacementmap == true){
+					gambe.material = seduta.material = struttura.material = new THREE.MeshPhongMaterial({ map: texture , needsUpdate: true, envMap: scene.background, displacementMap: displacement, aoMap: ao, normalMap: normale, roughnessMap: roughness, displacementBias: -0.5, });			
+				}else{
+					gambe.material = seduta.material = struttura.material = new THREE.MeshPhongMaterial({ map: texture , needsUpdate: true, envMap: scene.background, aoMap: ao, normalMap: normale,  roughnessMap: roughness, displacementBias: -0.5, });			
+				}								
+			});
+			datGui.add(settings, 'normalmap').onChange(function (value) {	
+				if(settings.normalmap == true){
+					gambe.material = seduta.material = struttura.material = new THREE.MeshPhongMaterial({ map: texture , needsUpdate: true, envMap: scene.background, displacementMap: displacement, aoMap: ao, roughnessMap: roughness, displacementBias: -0.5, });			
+				}else{
+					gambe.material = seduta.material = struttura.material = new THREE.MeshPhongMaterial({ map: texture , needsUpdate: true, envMap: scene.background, displacementMap: displacement, normalMap: normale, aoMap: ao,  roughnessMap: roughness, displacementBias: -0.5, });			
+				}								
+			});	
+			datGui.add(settings, 'occlusionmap').onChange(function (value) {	
+				if(settings.occlusionmap == true){
+					gambe.material = seduta.material = struttura.material = new THREE.MeshPhongMaterial({ map: texture , needsUpdate: true, envMap: scene.background, displacementMap: displacement, normalMap: normale, aoMap: ao, roughnessMap: roughness, displacementBias: -0.5, });	
+				}else{
+					gambe.material = seduta.material = struttura.material = new THREE.MeshPhongMaterial({ map: texture , needsUpdate: true, envMap: scene.background, displacementMap: displacement, normalMap: normale, roughnessMap: roughness, displacementBias: -0.5, });		
+				}								
+			});
+
+
+
+
 
 			sedia.add(struttura);
 			sedia.add(seduta);
@@ -195,7 +231,7 @@
 			console.log(sedia);
 		});
 
-
+		
 
 
 
