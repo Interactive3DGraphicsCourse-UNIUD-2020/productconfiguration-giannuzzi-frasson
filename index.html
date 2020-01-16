@@ -88,7 +88,7 @@
 			red: 1.0,
 			green: 1.0,
 			blue: 1.0,
-			intensity: 1.5,
+			intensity: 1.5
 		}
 		var cdiff = {
 			red: 0.7,
@@ -128,18 +128,20 @@
 		var gambe;
 		var sedia = new THREE.Object3D()
 		
-		//luce 1 (dx) DIRECTIONAL	
-		var light = new THREE.DirectionalLight( 0xffffff );
+		
+		//luce 1 (dx) 	
+		var light = new THREE.PointLight( 0xffffff );
 		light.position.set( 10.0, 10.0, 0.0).normalize();
 		scene.add(light);
-		//luce 2 (sx) DIRECTIONAL
-		var light2 = new THREE.DirectionalLight( 0xffffff );
+		//luce 2 (sx) 
+		var light2 = new THREE.PointLight( 0xffffff );
 		light2.position.set(10.0, 10.0, 0.0 ).normalize();
 		scene.add(light2);
-		//luce 3 (top) DIRECTIONAL
-		var light3 = new THREE.DirectionalLight( 0xffffff );
+		//luce 3 (top) 
+		var light3 = new THREE.PointLight( 0xffffff );
 		light3.position.set(0.0, 13.0, -7.0).normalize();
 		scene.add(light3);
+		
 
 		loader.load('models/sedia.obj', function (object) {
 			//object.envMap = textureCube;				
@@ -147,35 +149,44 @@
 			struttura = object.children[1];
 			seduta = object.children[0];
 
-			//ourMaterial = new THREE.ShaderMaterial({ uniforms: uniforms, vertexShader: vs, fragmentShader: fs });
-
-			/*
-			seduta.material = new THREE.MeshBasicMaterial( { color: 0xff2200 } );
-			struttura.material = new THREE.MeshBasicMaterial( { color: 0xfffff } );
-			gambe.material = new THREE.MeshBasicMaterial( { color: 0xff2200 } );
-			*/
-
-			//test				
-			var texture = new THREE.TextureLoader().load('textures/diesel/oak wood_refl.jpg');
+			
+			//texture				
+			var texture = new THREE.TextureLoader().load('textures/diesel/Quartz_001_COLOR.jpg');			
 			console.log(texture);
-			console.log(seduta.material);
-			texture.wrapS = THREE.RepeatWrapping;
-			texture.wrapT = THREE.RepeatWrapping;
+			console.log(seduta.material);			
+			texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 			texture.repeat.set(4, 4);
-			seduta.material = new THREE.MeshPhongMaterial({ color: 0xbbbbbb , needsUpdate: true });
-			struttura.material = new THREE.MeshPhongMaterial({ color: 0x333333 , needsUpdate: true });
-			gambe.material = new THREE.MeshPhongMaterial({ map: texture , needsUpdate: true });
-			//seduta.material.map = texture;
+			//displacement
+			var displacement = new THREE.TextureLoader().load('textures/diesel/Quartz_001_DISP.png');
+			displacement.wrapS = displacement.wrapT = THREE.RepeatWrapping;
+			displacement.repeat.set(4, 4);
+			//normale
+			var normale = new THREE.TextureLoader().load('textures/diesel/Quartz_001_NORM.jpg');
+			normale.wrapS = normale.wrapT = THREE.RepeatWrapping;
+			normale.repeat.set(4, 4);
+			//occlusion
+			var ao = new THREE.TextureLoader().load('textures/diesel/Quartz_001_OCC.jpg');
+			ao.wrapS = ao.wrapT = THREE.RepeatWrapping;
+			ao.repeat.set(4, 4);
+			//roughness
+			var roughness = new THREE.TextureLoader().load('textures/diesel/Quartz_001_ROUGH.jpg');
+			roughness.wrapS = roughness.wrapT = THREE.RepeatWrapping;
+			roughness.repeat.set(4, 4);			
+			//applicazione texture
+			seduta.material = new THREE.MeshPhongMaterial({ color: 0xbbbbbb , needsUpdate: true, envMap: scene.background });
+			struttura.material = new THREE.MeshPhongMaterial({ color: 0x333333 , needsUpdate: true, envMap: scene.background });
+			gambe.material = new THREE.MeshPhongMaterial({ map: texture , needsUpdate: true, envMap: scene.background, displacementMap: displacement, normalMap: normale, aoMap: ao, roughnessMap: roughness, displacementBias: -0.5, });			
 			console.log(seduta.material);
 			//fine test
-
+			
 			/*
+			//OLD
+			ourMaterial = new THREE.ShaderMaterial({ uniforms: uniforms, vertexShader: vs, fragmentShader: fs });
 			seduta.material = ourMaterial;
 			struttura.material = ourMaterial;
 			gambe.material = ourMaterial;
 			*/
 
-			//var mesh = new THREE.Mesh( sedia, ourMaterial );
 
 			sedia.add(struttura);
 			sedia.add(seduta);
