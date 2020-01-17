@@ -28,21 +28,26 @@
 	<script type="text/x-glsl" id="vertex">
 			varying vec3 vNormal;
 			varying vec3 vPosition;
+			varying vec2 uVv;
 			void main() {
 				vec4 vPos = modelViewMatrix * vec4( position, 1.0 );
 				vPosition = vPos.xyz;
 				vNormal = normalMatrix * normal;
+				uVv = uv;
 				gl_Position = projectionMatrix * vPos;
 			}
 		</script>
 	<script type="text/x-glsl" id="fragment">
 				varying vec3 vNormal;
 				varying vec3 vPosition;
+				varying vec2 uVv;
+
 				uniform vec3 pointLightPosition; 
 				uniform vec3 pointLightPosition2;
 				uniform vec3 pointLightPosition3;
-				uniform vec3 clight;
+				uniform vec3 clight;								
 				uniform vec3 cdiff;
+
 				const float PI = 3.14159;
 				void main() {
 					vec4 lPosition = viewMatrix * vec4( pointLightPosition, 1.0 );
@@ -73,7 +78,6 @@
 		document.body.appendChild(renderer.domElement);
 		var controls = new THREE.OrbitControls(camera);
 
-
 		//environment map
 		var path = 'textures/cubemap/';
 		var format = '.png	';
@@ -96,12 +100,36 @@
 			green: 0.0,
 			blue: 0.0,
 		}
+
+		//texture
+		var textureParameters = {
+				material: "Quartz_001_",
+				repeatS: 1.0,
+				repeatT: 1.0,
+			}		
+		
+		//proprietà materiale			
+		var diffuseMap = new THREE.TextureLoader().load('textures/diesel/' + textureParameters.material + 'COLOR.jpg');
+		var normalMap = new THREE.TextureLoader().load('textures/diesel/' + textureParameters.material + 'NORM.jpg');		
+		var displacementMap = new THREE.TextureLoader().load('textures/diesel/' + textureParameters.material + 'DISP.png');		
+		var aoMap = new THREE.TextureLoader().load('textures/diesel/' + textureParameters.material + 'OCC.jpg');
+		var roughnessMap = new THREE.TextureLoader().load('textures/diesel/' + textureParameters.material + 'ROUGH.jpg');					
+
+
 		var uniforms = {
 			cdiff: { type: "v3", value: new THREE.Vector3() },
+			clight: { type: "v3", value: new THREE.Vector3() },
+
 			pointLightPosition: { type: "v3", value: new THREE.Vector3() },
 			pointLightPosition2: { type: "v3", value: new THREE.Vector3() },
 			pointLightPosition3: { type: "v3", value: new THREE.Vector3() },
-			clight: { type: "v3", value: new THREE.Vector3() },
+
+			diffuseMap: { type: "t", value: diffuseMap },
+			normalMap: { type: "t", value: normalMap },
+			displacementMap: { type: "t", value: displacementMap },			
+			aoMap: { type: "t", value: aoMap },
+			roughnessMap: { type: "t", value: roughnessMap },			
+			textureRepeat: { type: "v2", value: new THREE.Vector2(1,1) }
 		};
 		vs = document.getElementById("vertex").textContent;
 		fs = document.getElementById("fragment").textContent;
@@ -122,107 +150,27 @@
 		uniforms.pointLightPosition3.value = new THREE.Vector3(lightMesh3.position.x, lightMesh3.position.y, lightMesh3.position.z);
 		scene.add(lightMesh3);
 
+		var ourMaterial = new THREE.ShaderMaterial({ 
+				uniforms: uniforms, 
+				vertexShader: vs, 
+				fragmentShader: fs 
+			});
+
 		//carico oggetto
 		var loader = new THREE.OBJLoader();
 		var seduta;
 		var struttura;
 		var gambe;
 		var sedia = new THREE.Object3D()
-		
-		
-		//luce 1 (dx) 	
-		var light = new THREE.PointLight( 0xffffff );
-		light.position.set( 10.0, 10.0, 0.0);
-		scene.add(light);
-		//luce 2 (sx) 
-		var light2 = new THREE.PointLight( 0xffffff );
-		light2.position.set(10.0, 10.0, 0.0 );
-		scene.add(light2);
-		//luce 3 (top) 
-		var light3 = new THREE.PointLight( 0xffffff );
-		light3.position.set(0.0, 13.0, -7.0);
-		scene.add(light3);
-		//light 4 
-		light4 = new THREE.AmbientLight( 0xffffff);
-    	scene.add(light4);
-
-		loader.load('models/sedia.obj', function (object) {
-			//object.envMap = textureCube;				
+	
+		loader.load('models/sedia.obj', function (object) {							
 			gambe = object.children[2];
 			struttura = object.children[1];
-			seduta = object.children[0];
-
+			seduta = object.children[0];		
 			
-			//texture				
-			var texture = new THREE.TextureLoader().load('textures/diesel/Quartz_001_COLOR.jpg');			
-			console.log(texture);
-			console.log(seduta.material);			
-			texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-			texture.repeat.set(4, 4);
-			//displacement
-			var displacement = new THREE.TextureLoader().load('textures/diesel/Quartz_001_DISP.png');
-			displacement.wrapS = displacement.wrapT = THREE.RepeatWrapping;
-			displacement.repeat.set(4, 4);
-			//normale
-			var normale = new THREE.TextureLoader().load('textures/diesel/Quartz_001_NORM.jpg');
-			normale.wrapS = normale.wrapT = THREE.RepeatWrapping;
-			normale.repeat.set(4, 4);
-			//occlusion
-			var ao = new THREE.TextureLoader().load('textures/diesel/Quartz_001_OCC.jpg');
-			ao.wrapS = ao.wrapT = THREE.RepeatWrapping;
-			ao.repeat.set(4, 4);
-			//roughness
-			var roughness = new THREE.TextureLoader().load('textures/diesel/Quartz_001_ROUGH.jpg');
-			roughness.wrapS = roughness.wrapT = THREE.RepeatWrapping;
-			roughness.repeat.set(4, 4);			
-			//applicazione texture
-			seduta.material = new THREE.MeshPhongMaterial({ map: texture , needsUpdate: true, envMap: scene.background, displacementMap: displacement, normalMap: normale, aoMap: ao, roughnessMap: roughness, displacementBias: -0.5, });		
-			struttura.material = new THREE.MeshPhongMaterial({ map: texture , needsUpdate: true, envMap: scene.background, displacementMap: displacement, normalMap: normale, aoMap: ao, roughnessMap: roughness, displacementBias: -0.5, });		
-			gambe.material = new THREE.MeshPhongMaterial({ map: texture , needsUpdate: true, envMap: scene.background, displacementMap: displacement, normalMap: normale, aoMap: ao, roughnessMap: roughness, displacementBias: -0.5, });			
-			console.log(seduta.material);
-			//fine test
-			
-			/*
-			//OLD
-			ourMaterial = new THREE.ShaderMaterial({ uniforms: uniforms, vertexShader: vs, fragmentShader: fs });
 			seduta.material = ourMaterial;
 			struttura.material = ourMaterial;
 			gambe.material = ourMaterial;
-			*/
-
-			//GUI
-			const datGui  = new dat.GUI({ autoPlace: true });  
-			datGui.domElement.id = 'gui'       	
-			var settings = {
-				normalmap: true,
-				displacementmap: true,
-				occlusionmap: true,
-			};
-			datGui.add(settings, 'displacementmap').onChange(function (value) {	
-				if(settings.displacementmap == true){
-					gambe.material = seduta.material = struttura.material = new THREE.MeshPhongMaterial({ map: texture , needsUpdate: true, envMap: scene.background, displacementMap: displacement, aoMap: ao, normalMap: normale, roughnessMap: roughness, displacementBias: -0.5, });			
-				}else{
-					gambe.material = seduta.material = struttura.material = new THREE.MeshPhongMaterial({ map: texture , needsUpdate: true, envMap: scene.background, aoMap: ao, normalMap: normale,  roughnessMap: roughness, displacementBias: -0.5, });			
-				}								
-			});
-			datGui.add(settings, 'normalmap').onChange(function (value) {	
-				if(settings.normalmap == true){
-					gambe.material = seduta.material = struttura.material = new THREE.MeshPhongMaterial({ map: texture , needsUpdate: true, envMap: scene.background, displacementMap: displacement, aoMap: ao, normalMap: normale, roughnessMap: roughness, displacementBias: -0.5, });			
-				}else{
-					gambe.material = seduta.material = struttura.material = new THREE.MeshPhongMaterial({ map: texture , needsUpdate: true, envMap: scene.background, displacementMap: displacement, aoMap: ao,  roughnessMap: roughness, displacementBias: -0.5, });			
-				}								
-			});	
-			datGui.add(settings, 'occlusionmap').onChange(function (value) {	
-				if(settings.occlusionmap == true){
-					gambe.material = seduta.material = struttura.material = new THREE.MeshPhongMaterial({ map: texture , needsUpdate: true, envMap: scene.background, displacementMap: displacement, normalMap: normale, aoMap: ao, roughnessMap: roughness, displacementBias: -0.5, });	
-				}else{
-					gambe.material = seduta.material = struttura.material = new THREE.MeshPhongMaterial({ map: texture , needsUpdate: true, envMap: scene.background, displacementMap: displacement, normalMap: normale, roughnessMap: roughness, displacementBias: -0.5, });		
-				}								
-			});
-
-
-
-
 
 			sedia.add(struttura);
 			sedia.add(seduta);
@@ -230,10 +178,6 @@
 			scene.add(sedia);
 			console.log(sedia);
 		});
-
-		
-
-
 
 		stats = new Stats();
 		stats.domElement.style.position = 'absolute';
@@ -248,14 +192,21 @@
 			renderer.render(scene, camera);
 		}
 		function updateUniforms() {
-			uniforms.cdiff.value = new THREE.Vector3(cdiff.red, cdiff.green, cdiff.blue);
-			uniforms.clight.value = new THREE.Vector3(
+			uniforms.cdiff.value = new THREE.Vector3 (cdiff.red, cdiff.green, cdiff.blue);
+			uniforms.clight.value = new THREE.Vector3
+			(
 				lightParameters.red * lightParameters.intensity,
 				lightParameters.green * lightParameters.intensity,
-				lightParameters.blue * lightParameters.intensity);
+				lightParameters.blue * lightParameters.intensity
+			);
+			uniforms.textureRepeat.value = new THREE.Vector2( textureParameters.repeatS, textureParameters.repeatT);
+			uniforms.diffuseMap.value = diffuseMap;
+			uniforms.normalMap.value = normalMap;
+			uniforms.displacementMap.value = displacementMap;
+			uniforms.aoMap.value = aoMap;
+			uniforms.roughnessMap.value = roughnessMap;
 		}
 		render();
 	</script>
 </body>
-
 </html>
