@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+
+<head>
+    <title>GOLDEN</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+        body {
+            background-color: #f0f0f0;
+            margin: 0px;
+            overflow: hidden;
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <script src="libs/three.min.js"></script>
+    <script src="libs/stats.min.js"></script>
+	<script src="libs/OrbitControls.js"></script>
+	<script src="libs/OBJLoader.js"></script>
+    <script src='libs/dat.gui.min.js'></script>
+
+    <!-- shaders -->
+
+    <script type="text/x-glsl" id="vertex">
+		varying vec3 vNormal;
+		varying vec3 vPosition;
+		void main() {
+			vec4 vPos = modelViewMatrix * vec4( position, 1.0 );
+			vPosition = vPos.xyz;
+			vNormal = normalMatrix * normal;
+			gl_Position = projectionMatrix * vPos;
+		}
+		</script>
+
+    <script type="text/x-glsl" id="fragment">
+			varying vec3 vNormal;
+			varying vec3 vPosition;
+			uniform vec3 pointLightPosition; // in world space
+			uniform vec3 pointLightPosition1; // in world space
+			uniform vec3 pointLightPosition2; // in world space
+			uniform vec3 pointLightPosition3; // in world space
+			uniform vec3 clight;
+			uniform vec3 cspec;
+			uniform float roughness;
+			const float PI = 3.14159;
+			vec3 FSchlick(float lDoth) {
+				return (cspec + (vec3(1.0)-cspec)*pow(1.0 - lDoth,5.0));
+			}
+			float DGGX(float nDoth, float alpha) {
+				float alpha2 = alpha*alpha;
+				float d = nDoth*nDoth*(alpha2-1.0)+1.0;
+				return (  alpha2 / (PI*d*d));
+			}
+			float G1(float dotProduct, float k) {
+				return (dotProduct / (dotProduct*(1.0-k) + k) );
+			}
+			float GSmith(float nDotv, float nDotl) {
+					float k = roughness*roughness;
+					return G1(nDotl,k)*G1(nDotv,k);
+			}
+			void main() {
+				vec4 lPosition = viewMatrix * vec4( pointLightPosition, 1.0 );
+				vec4 lPosition1 = viewMatrix * vec4( pointLightPosition1, 1.0 );
+				vec4 lPosition2 = viewMatrix * vec4( pointLightPosition2, 1.0 );
+				vec4 lPosition3 = viewMatrix * vec4( pointLightPosition3, 1.0 );
+
+				vec3 l = normalize(lPosition.xyz - vPosition.xyz);
+				vec3 l1 = normalize(lPosition1.xyz - vPosition.xyz);
+				vec3 l2 = normalize(lPosition2.xyz - vPosition.xyz);
+				vec3 l3 = normalize(lPosition3.xyz - vPosition.xyz);
+				
+				vec3 n = normalize( vNormal );  // interpolation destroys normalization, so we have to normalize
+				vec3 v = normalize( -vPosition);
+
+				vec3 h = normalize( v + l);
+				vec3 h1 = normalize( v + l1);
+				vec3 h2 = normalize( v + l2);
+				vec3 h3 = normalize( v + l3);
+				
+				// small quantity to prevent divisions by 0
+				float nDotl = max(dot( n, l ),0.000001);
+				float nDotl1 = max(dot( n, l1 ),0.000001);
+				float nDotl2 = max(dot( n, l2 ),0.000001);
+				float nDotl3 = max(dot( n, l3 ),0.000001);
+
+				float lDoth = max(dot( l, h ),0.000001);
+				float lDoth1 = max(dot( l1, h1 ),0.000001);
+				float lDoth2 = max(dot( l2, h2 ),0.000001);
+				float lDoth3 = max(dot( l3, h3 ),0.000001);
+				
+				float nDoth = max(dot( n, h ),0.000001);
+				float nDoth1 = max(dot( n, h1 ),0.000001);
+				float nDoth2 = max(dot( n, h2 ),0.000001);
+				float nDoth3 = max(dot( n, h3 ),0.000001);
+				
+				float vDoth = max(dot( v, h ),0.000001);
+				float vDoth1 = max(dot( v, h1 ),0.000001);
+				float vDoth2 = max(dot( v, h2 ),0.000001);
+				float vDoth3 = max(dot( v, h3 ),0.000001);
+				
+				float nDotv = max(dot( n, v ),0.000001);
+				
+				vec3 specularBRDF = FSchlick(lDoth)*GSmith(nDotv,nDotl)*DGGX(nDoth,roughness*roughness)/
+					(4.0*nDotl*nDotv);
+				vec3 specularBRDF1 = FSchlick(lDoth1)*GSmith(nDotv,nDotl1)*DGGX(nDoth1,roughness*roughness)/
+					(4.0*nDotl1*nDotv);
+				vec3 specularBRDF2 = FSchlick(lDoth2)*GSmith(nDotv,nDotl2)*DGGX(nDoth2,roughness*roughness)/
+					(4.0*nDotl2*nDotv);
+				vec3 specularBRDF3 = FSchlick(lDoth3)*GSmith(nDotv,nDotl3)*DGGX(nDoth3,roughness*roughness)/
+					(4.0*nDotl3*nDotv); 
+				
+				vec3 outRadiance = (PI* clight * nDotl * specularBRDF) + 
+					(PI* clight * nDotl1 * specularBRDF1) +
+					(PI* clight * nDotl2 * specularBRDF2) +
+					(PI* clight * nDotl3 * specularBRDF3) ;
+					
+				// gamma encode the final value
+				gl_FragColor = vec4(pow( outRadiance, vec3(1.0/2.2)), 1.0);
+				//gl_FragColor = vec4(outRadiance,1.0);
+			}
+		</script>
+
+    <!-- three.js code -->
+
+    <script>
+        var renderer = new THREE.WebGLRenderer({ antialias: true });
+        var camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1, 1000);
+        var controls = new THREE.OrbitControls(camera, renderer.domElement);
+        var scene = new THREE.Scene();
+        // default: white, 1.0 intensity
+        var lightParameters = {
+            red: 1.0,
+            green: 1.0,
+            blue: 1.0,
+            intensity: 1.0,
+        }
+        // default: gold
+        var cspec = {
+            red: 1.0,
+            green: 0.71,
+            blue: 0.29,
+            roughness: 0.54
+        }
+        var uniforms = {
+            cspec: { type: "v3", value: new THREE.Vector3() },
+            roughness: { type: "f", value: 0.5 },
+            pointLightPosition: { type: "v3", value: new THREE.Vector3() },
+            pointLightPosition1: { type: "v3", value: new THREE.Vector3() },
+            pointLightPosition2: { type: "v3", value: new THREE.Vector3() },
+            pointLightPosition3: { type: "v3", value: new THREE.Vector3() },
+            clight: { type: "v3", value: new THREE.Vector3() },
+        };
+        vs = document.getElementById("vertex").textContent;
+        fs = document.getElementById("fragment").textContent;
+        ourMaterial = new THREE.ShaderMaterial({ uniforms: uniforms, vertexShader: vs, fragmentShader: fs });
+        //carico oggetto
+		var loader = new THREE.OBJLoader();
+		var seduta;
+		var struttura;
+		var gambe;
+		var sedia = new THREE.Object3D()
+		
+		loader.load('models/sedia.obj', function (object) {
+			//object.envMap = textureCube;				
+			gambe = object.children[2];
+			struttura = object.children[1];
+			seduta = object.children[0];
+			seduta.material = ourMaterial;
+			struttura.material = ourMaterial;
+			gambe.material = ourMaterial;
+			sedia.add(seduta);
+			sedia.add(struttura);
+			sedia.add(gambe);
+			scene.add(sedia);
+		});	 
+
+
+        var lightMesh = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 16),
+            new THREE.MeshBasicMaterial({ color: 0xffff00, wireframe: true }));
+        lightMesh.position.set(7.0, 7.0, 7.0);
+
+        var lightMesh1 = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 16),
+            new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true }));
+        lightMesh1.position.set(-7.0, 7.0, 7.0);
+
+        var lightMesh2 = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 16),
+            new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true }));
+        lightMesh2.position.set(-7.0, 7.0, -7.0);
+
+        var lightMesh3 = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 16),
+            new THREE.MeshBasicMaterial({ color: 0x0000ff, wireframe: true }));
+        lightMesh3.position.set(-7.0, -7.0, -7.0);
+
+        uniforms.pointLightPosition.value = new THREE.Vector3(lightMesh.position.x, lightMesh.position.y, lightMesh.position.z);
+        uniforms.pointLightPosition1.value = new THREE.Vector3(lightMesh1.position.x, lightMesh1.position.y, lightMesh1.position.z);
+        uniforms.pointLightPosition2.value = new THREE.Vector3(lightMesh2.position.x, lightMesh2.position.y, lightMesh2.position.z);
+        uniforms.pointLightPosition3.value = new THREE.Vector3(lightMesh3.position.x, lightMesh3.position.y, lightMesh3.position.z);
+
+        var gui;
+        var stats = new Stats();
+        
+       
+        function init() {
+            renderer.gammaInput = true;
+            renderer.gammaOutput = true;
+            renderer.setClearColor(0xf0f0f0);
+            camera.position.set(0, 10, 10);
+
+            scene.add(camera);
+            scene.add(lightMesh);
+            scene.add(lightMesh1);
+            scene.add(lightMesh2);
+            scene.add(lightMesh3);
+            document.body.appendChild(renderer.domElement);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            controls.addEventListener('change', render);
+            controls.minDistance = 1;
+            controls.maxDistance = 100;
+            //controls.maxPolarAngle = Math.PI / 2;
+            controls.enablePan = false;
+
+            controls.update();
+            window.addEventListener('resize', onResize, false);
+            stats.domElement.style.position = 'absolute';
+            stats.domElement.style.top = '0px';
+            document.body.appendChild(stats.domElement);
+        }
+        function onResize() {
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            camera.aspect = (window.innerWidth / window.innerHeight);
+            camera.updateProjectionMatrix();
+        }
+        function update() {
+            requestAnimationFrame(update);
+            stats.update();
+        }
+        function render() {
+            updateUniforms();
+            renderer.render(scene, camera);
+        }
+        function clearGui() {
+            if (gui) gui.destroy();
+            gui = new dat.GUI();
+            gui.open();
+        }
+        function buildGui() {
+            clearGui();
+            lightSettings = gui.addFolder('Light Parameters');
+            lightSettings.add(lightParameters, 'red').min(0).max(1).onChange(function (newVal) { render() });
+            lightSettings.add(lightParameters, 'green').min(0).max(1).onChange(function (newVal) { render() });
+            lightSettings.add(lightParameters, 'blue').min(0).max(1).onChange(function (newVal) { render() });
+            lightSettings.add(lightParameters, 'intensity').min(0).max(10000).onChange(function (newVal) { render() });
+            materialSettings = gui.addFolder('material settings');
+            materialSettings.add(cspec, 'red').min(0).max(1).onChange(function (newVal) { render() });
+            materialSettings.add(cspec, 'green').min(0).max(1).onChange(function (newVal) { render() });
+            materialSettings.add(cspec, 'blue').min(0).max(1).onChange(function (newVal) { render() });
+            materialSettings.add(cspec, 'roughness').min(0).max(1).onChange(function (newVal) { render() });
+        }
+        function updateUniforms() {
+            uniforms.cspec.value = new THREE.Vector3(cspec.red, cspec.green, cspec.blue);
+            uniforms.roughness.value = cspec.roughness > 0.0 ? cspec.roughness : 0.01;
+            uniforms.clight.value = new THREE.Vector3(
+                lightParameters.red * lightParameters.intensity,
+                lightParameters.green * lightParameters.intensity,
+                lightParameters.blue * lightParameters.intensity);
+        }
+        init();
+        buildGui();
+        update();
+        render();
+    </script>
+</body>
+
+</html>
