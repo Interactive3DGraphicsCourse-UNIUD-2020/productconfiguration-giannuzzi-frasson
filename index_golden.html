@@ -10,7 +10,6 @@
             margin: 0px;
             overflow: hidden;
         }
-
     </style>
 </head>
 
@@ -18,8 +17,8 @@
 
     <script src="libs/three.min.js"></script>
     <script src="libs/stats.min.js"></script>
-	<script src="libs/OrbitControls.js"></script>
-	<script src="libs/OBJLoader.js"></script>
+    <script src="libs/OrbitControls.js"></script>
+    <script src="libs/OBJLoader.js"></script>
     <script src='libs/dat.gui.min.js'></script>
 
     <!-- shaders -->
@@ -45,7 +44,8 @@
 			uniform vec3 clight;
 			uniform vec3 cspec;
 			uniform float roughness;
-			const float PI = 3.14159;
+            const float PI = 3.14159;
+            
 			vec3 FSchlick(float lDoth) {
 				return (cspec + (vec3(1.0)-cspec)*pow(1.0 - lDoth,5.0));
 			}
@@ -157,25 +157,25 @@
         fs = document.getElementById("fragment").textContent;
         ourMaterial = new THREE.ShaderMaterial({ uniforms: uniforms, vertexShader: vs, fragmentShader: fs });
         //carico oggetto
-		var loader = new THREE.OBJLoader();
-		var seduta;
-		var struttura;
-		var gambe;
-		var sedia = new THREE.Object3D()
-		
-		loader.load('models/sedia.obj', function (object) {
-			//object.envMap = textureCube;				
-			gambe = object.children[2];
-			struttura = object.children[1];
-			seduta = object.children[0];
-			seduta.material = ourMaterial;
-			struttura.material = ourMaterial;
-			gambe.material = ourMaterial;
-			sedia.add(seduta);
-			sedia.add(struttura);
-			sedia.add(gambe);
-			scene.add(sedia);
-		});	 
+        var loader = new THREE.OBJLoader();
+        var seduta;
+        var struttura;
+        var gambe;
+        var sedia = new THREE.Object3D()
+
+        loader.load('models/sedia.obj', function (object) {
+            //object.envMap = textureCube;				
+            gambe = object.children[2];
+            struttura = object.children[1];
+            seduta = object.children[0];
+            seduta.material = ourMaterial;
+            struttura.material = ourMaterial;
+            gambe.material = ourMaterial;
+            sedia.add(seduta);
+            sedia.add(struttura);
+            sedia.add(gambe);
+            scene.add(sedia);
+        });
 
 
         var lightMesh = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 16),
@@ -201,8 +201,8 @@
 
         var gui;
         var stats = new Stats();
-        
-       
+
+
         function init() {
             renderer.gammaInput = true;
             renderer.gammaOutput = true;
