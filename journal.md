@@ -5,6 +5,10 @@
 -inizio implementazione materiali sulle mesh dell object
 15 gennaio:
 -implementazione delle texture nei materiali Phong 
+18 gennaio:
+-ridefinizione degli uniforms e proprietà del materiale dell'oggetto (specular, diffuse, normal, roughness)
+19 gennaio:
+-codice BRDF nel fragment shader, GUI di debug 
 20 gennaio:
--fine implementazione materiale di tipo substance con relative mappe: Diffuse, Specular, Roughness, Normal, Displacement.
--prova del materiale su mesh base e su mesh destinatarie.
+-fine implementazione materiale di tipo substance con relative mappe: diffuse, specular, roughness, normal, displacement, ambient occlusion
+-prova del materiale su mesh base e su mesh destinatarie
