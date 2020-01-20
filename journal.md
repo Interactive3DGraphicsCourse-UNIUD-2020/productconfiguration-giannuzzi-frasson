@@ -5,3 +5,6 @@
 -inizio implementazione materiali sulle mesh dell object
 15 gennaio:
 -implementazione delle texture nei materiali Phong 
+20 gennaio:
+-fine implementazione materiale di tipo substance con relative mappe: Diffuse, Specular, Roughness, Normal, Displacement.
+-prova del materiale su mesh base e su mesh destinatarie.

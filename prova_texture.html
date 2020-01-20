@@ -49,25 +49,18 @@
     <!-- shaders -->
 
     <script type="text/x-glsl" id="vertex">
-        attribute vec4 tangent;
-        attribute float displacementScale;
-        varying vec3 vTangent;
-        varying vec3 vBitangent;
-        
+        uniform float displacementScale;
+        uniform sampler2D displacementMap; 
         varying vec3 vNormal;
 		varying vec3 vPosition;
 		varying vec2 uVv;
-
+        uniform vec2 textureRepeat;
         
 		void main() {
-            vec3 newPosition = position + vNormal * displacementScale;
+            vec3 newPosition = position + normal * ((texture2D( displacementMap, uv*textureRepeat ).xyz) * displacementScale);
 			vec4 vPos = modelViewMatrix * vec4( newPosition, 1.0 );
 			vPosition = vPos.xyz;
             vNormal = normalize(normalMatrix * normal);
-            vec3 objectTangent = vec3( tangent.xyz );
-			vec3 transformedTangent = normalMatrix * objectTangent;
-			vTangent = normalize( transformedTangent );
-			vBitangent = normalize( cross( vNormal, vTangent ) * tangent.w );
             uVv = uv;
 			gl_Position = projectionMatrix * vPos;
 		}
@@ -75,8 +68,6 @@
 
     <script type="text/x-glsl" id="fragment">
             varying vec3 vNormal;
-            varying vec3 vTangent;
-			varying vec3 vBitangent;
             varying vec3 vPosition;
 			varying vec2 uVv;
             uniform vec3 pointLightPosition; // in world space
@@ -176,7 +167,7 @@
                 vec3 BRDF1 = (vec3(1.0)-fresnel1)*cdiff/PI + fresnel1*GSmith(nDotv,nDotl1)*DGGX(nDoth1,roughness*roughness)/
 					(4.0*nDotl1*nDotv);
                 
-                vec3 outRadiance =  (PI*clight * nDotl * BRDF) + (PI*clight * nDotl1 * BRDF1) + ambientLight*cdiff*texture2D( aoMap, uVv ).xyz;
+                vec3 outRadiance =  (PI*clight * nDotl * BRDF) + (PI*clight * nDotl1 * BRDF1) + ambientLight*cdiff*texture2D( aoMap, uVv*textureRepeat ).xyz;
 				// gamma encode the final value
 				gl_FragColor = vec4(pow( outRadiance, vec3(1.0/2.2)), 1.0);
 			}
@@ -211,7 +202,7 @@
             repeatS: 1.0,
             repeatT: 1.0,
             normalScale: 1.0,
-            displacementScale: 0.5,
+            displacementScale: 1.0,
         }      
 
         var diffuseMap = loadTexture( "textures/diesel/Marble_Tiles_001_basecolor.jpg" );
@@ -219,7 +210,7 @@
         var roughnessMap = loadTexture( "textures/diesel/Marble_Tiles_001_roughness.jpg" );
         var normalMap = loadTexture( "textures/diesel/Marble_Tiles_001_normal.jpg" );
         var aoMap = loadTexture( "textures/diesel/Marble_Tiles_001_ambientOcclusion.jpg" );		
-		var displacementMap = loadTexture( "textures/diesel/Marble_Tiles_001_height.jpg" );
+		var displacementMap = loadTexture( "textures/diesel/Marble_Tiles_001_height.png" );
 		
 
 
@@ -230,6 +221,7 @@
             normalMap: { type: "t", value: normalMap },
             aoMap: { type: "t", value: aoMap },
             displacementMap: { type: "t", value: displacementMap },
+            displacementScale: { type: "f", value: 1.0 },            
             normalScale: { type: "v2", value: new THREE.Vector2(1, 1) },
             pointLightPosition: { type: "v3", value: new THREE.Vector3() },
             pointLightPosition1: { type: "v3", value: new THREE.Vector3() },
@@ -244,17 +236,17 @@
         var ourMaterial = new THREE.ShaderMaterial({ uniforms: uniforms, vertexShader: vs, fragmentShader: fs });
         ourMaterial.extensions.derivatives = true;
         //var ourMaterial = new THREE.MeshBasicMaterial({ map: diffuseMap });
-        geometry = new THREE.SphereBufferGeometry(2, 32, 32);
+        geometry = new THREE.SphereBufferGeometry(2, 1000, 1000);
         //geometry = new THREE.BoxGeometry( 1, 1, 1, 10,10,10);
-       // var mesh = new THREE.Mesh(geometry, ourMaterial);
+        var sedia= new THREE.Mesh(geometry, ourMaterial);
         //carico oggetto
        
         var loader = new THREE.OBJLoader();
         var seduta;
         var struttura;
         var gambe;
-        var sedia = new THREE.Object3D()
-
+       // var sedia = new THREE.Object3D()
+        /*
         loader.load('models/sedia.obj', function (object) {
             //object.envMap = textureCube;				
             gambe = object.children[2];
@@ -268,7 +260,7 @@
             sedia.add(gambe);
             scene.add(sedia);
         });
-
+        */
         var lightMesh = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 16),
             new THREE.MeshBasicMaterial({ color: 0xffff00, wireframe: true }));
         lightMesh.position.set(7.0, 7.0, 7.0);
@@ -374,7 +366,7 @@
             textureSettings.add(textureParameters, 'repeatS').min(0.1).max(10).onChange(function (newVal) { render() });
             textureSettings.add(textureParameters, 'repeatT').min(0.1).max(10).onChange(function (newVal) { render() });
             textureSettings.add(textureParameters,'normalScale').min(-3).max(3).onChange( function( newVal ) {render()});
-            textureSettings.add(textureParameters, 'displacementScale').min(0).max(1).onChange(function (newVal) { render() });
+            textureSettings.add(textureParameters, 'displacementScale').min(-3).max(3).onChange(function (newVal) { render() });
         }
 
         function updateUniforms() {
@@ -394,6 +386,7 @@
             uniforms.normalMap.value = normalMap;
             uniforms.aoMap.value = aoMap;
             uniforms.displacementMap.value = displacementMap;
+            uniforms.displacementScale.value = textureParameters.displacementScale;
             uniforms.normalScale.value = new THREE.Vector2(textureParameters.normalScale, textureParameters.normalScale);
         }
 
