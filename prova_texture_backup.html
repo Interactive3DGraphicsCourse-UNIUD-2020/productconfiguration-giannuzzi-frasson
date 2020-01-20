@@ -50,7 +50,6 @@
 
     <script type="text/x-glsl" id="vertex">
         attribute vec4 tangent;
-        attribute float displacementScale;
         varying vec3 vTangent;
         varying vec3 vBitangent;
         
@@ -60,8 +59,7 @@
 
         
 		void main() {
-            vec3 newPosition = position + vNormal * displacementScale;
-			vec4 vPos = modelViewMatrix * vec4( newPosition, 1.0 );
+			vec4 vPos = modelViewMatrix * vec4( position, 1.0 );
 			vPosition = vPos.xyz;
             vNormal = normalize(normalMatrix * normal);
             vec3 objectTangent = vec3( tangent.xyz );
