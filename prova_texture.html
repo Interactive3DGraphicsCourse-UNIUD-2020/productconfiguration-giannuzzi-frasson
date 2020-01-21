@@ -48,7 +48,7 @@
 
     <!-- shaders -->
 
-    <script type="text/x-glsl" id="vertex">
+    <script type="text/x-glsl" id="vertex">               
         uniform float displacementScale;
         uniform sampler2D displacementMap; 
         varying vec3 vNormal;
@@ -68,7 +68,7 @@
 		}
 		</script>
 
-    <script type="text/x-glsl" id="fragment">
+    <script type="text/x-glsl" id="fragment">           
             varying vec3 vNormal;
             varying vec3 vPosition;
             varying vec2 uVv;
@@ -218,6 +218,12 @@
             normalScale: 1.0,
             displacementScale: 0.0,
         }      
+        
+        var geo = new THREE.PlaneBufferGeometry(50, 50, 8, 8);
+        var mat = new THREE.MeshPhongMaterial({ color: 0xa89332});
+        var plane = new THREE.Mesh(geo, mat);
+        plane.rotateX( - Math.PI / 2);
+        scene.add(plane);
 
         var diffuseMap = loadTexture( "textures/diesel/Marble_Tiles_001_basecolor.jpg" );
         var specularMap = loadTexture( "textures/diesel/Marble_Tiles_001_roughness.jpg" );
@@ -228,7 +234,6 @@
 		
         var loader = new THREE.CubeTextureLoader();
 				loader.setPath( 'textures/cubemap/' );
-
 				var textureCube = loader.load( [
 					'px.png', 'nx.png',
 					'py.png', 'ny.png',
@@ -236,6 +241,7 @@
 				] );
         scene.background = textureCube;
 
+        /*
         var uniforms = {
             specularMap: { type: "t", value: specularMap },
             diffuseMap: { type: "t", value: diffuseMap },
@@ -252,17 +258,36 @@
             ambientLight:	{ type: "v3", value: new THREE.Vector3() },
             textureRepeat: { type: "v2", value: new THREE.Vector2(1, 1) }
         };
-
+        */
+        
+        var uniforms = THREE.UniformsUtils.merge([
+                THREE.UniformsLib.shadow,
+                THREE.UniformsLib.lights,
+        {
+            specularMap: { type: "t", value: specularMap },
+            diffuseMap: { type: "t", value: diffuseMap },
+            roughnessMap: { type: "t", value: roughnessMap },
+            normalMap: { type: "t", value: normalMap },
+            aoMap: { type: "t", value: aoMap },
+            displacementMap: { type: "t", value: displacementMap },
+            displacementScale: { type: "f", value: 1.0 },            
+            normalScale: { type: "v2", value: new THREE.Vector2(1, 1) },
+            pointLightPosition: { type: "v3", value: new THREE.Vector3() },
+            pointLightPosition1: { type: "v3", value: new THREE.Vector3() },
+            clight: { type: "v3", value: new THREE.Vector3() },
+            envMap:	{ type: "t", value: textureCube},
+            ambientLight:	{ type: "v3", value: new THREE.Vector3() },
+            textureRepeat: { type: "v2", value: new THREE.Vector2(1, 1) },
+            lights: true,
+        }]);
+        
         vs = document.getElementById("vertex").textContent;
         fs = document.getElementById("fragment").textContent;
 
         var ourMaterial = new THREE.ShaderMaterial({ uniforms: uniforms, vertexShader: vs, fragmentShader: fs });
+        ourMaterial.lights = true;
         ourMaterial.extensions.derivatives = true;
-        //var ourMaterial = new THREE.MeshBasicMaterial({ map: diffuseMap });
-        //geometry = new THREE.SphereBufferGeometry(2, 1000, 1000);
-        //geometry = new THREE.BoxGeometry( 1, 1, 1, 10,10,10);
-        //var sedia= new THREE.Mesh(geometry, ourMaterial);
-
+    
         //carico oggetto       
         var loader = new THREE.OBJLoader();
         var seduta;
@@ -293,7 +318,7 @@
 
         var lightMesh1 = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 16),
             new THREE.MeshBasicMaterial({ color: 0xffff00, wireframe: true }));
-        lightMesh1.position.set(7.0, -7.0, -7.0);
+        lightMesh1.position.set(-7.0, 7.0, 7.0);
         uniforms.pointLightPosition1.value = new THREE.Vector3(lightMesh1.position.x,
             lightMesh1.position.y,
             lightMesh1.position.z);
@@ -318,6 +343,23 @@
         function init() {
 
             renderer.setClearColor(0xf0f0f0);
+
+            //shadowmap
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.BasicShadowMap;           
+            lightMesh.castShadow = true;
+            /*
+            lightMesh.shadow.camera.near = 8;
+            lightMesh.shadow.camera.far = 30;
+            lightMesh.shadow.mapSize.width = 1024;
+            lightMesh.shadow.mapSize.height = 1024;
+            lightMesh.shadow.bias = 0.0001;
+            */
+            sedia.castShadow = true;
+            sedia.receiveShadow = true;
+            plane.castShadow = false;
+            plane.receiveShadow = true;
+
 
             camera.position.set(0, 10, 10);
             scene.add(camera);
