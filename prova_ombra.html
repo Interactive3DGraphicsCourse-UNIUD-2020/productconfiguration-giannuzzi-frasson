@@ -1,0 +1,82 @@
+<html>
+
+<head>
+    <title>Assignment II</title>
+    <style>
+        body {
+            font-family: Monospace;
+            background-color: #f0f0f0;
+            margin: 0px;
+            overflow: hidden;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+
+</head>
+
+<body>
+    <script src="libs/three.min.js"></script>
+    <script src="libs/stats.min.js"></script>
+    <script src="libs/OBJLoader.js"></script>
+    <script src="libs/OrbitControls.js"></script>
+
+    <script>
+        
+        var scene = new THREE.Scene();
+		var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+		var renderer = new THREE.WebGLRenderer();
+		renderer.shadowMap.enabled = true;
+		renderer.shadowMap.type = THREE.BasicShadowMap;
+		
+        renderer.setSize(window.innerWidth, window.innerHeight);
+		document.body.appendChild(renderer.domElement);
+		var controls = new THREE.OrbitControls(camera);
+
+        var geometry_plane = new THREE.PlaneGeometry(200, 200, 32);
+		var material_plane = new THREE.MeshPhongMaterial({ color: 0x242424, side: THREE.DoubleSide, });
+		var plane = new THREE.Mesh(geometry_plane, material_plane);
+		plane.rotation.x -= Math.PI /2;
+		plane.receiveShadow = true;
+		scene.add(plane);
+        var ambientLight = new THREE.AmbientLight(0xffffff,0.2);
+        scene.add(ambientLight);
+
+        var light = new THREE.PointLight(0xffffff, 0.8, 18);
+        light.position.set(-3, 6, -3);
+        light.castShadow = true;
+        light.shadow.camera.near = 0.1;
+        light.shadow.camera.far = 25;
+        scene.add(light);
+
+        var cube = new THREE.Mesh(
+			new THREE.BoxGeometry(1, 1, 1),
+			new THREE.MeshPhongMaterial({ color: 0xffff00 })
+		);
+		cube.castShadow = true;
+		cube.receiveShadow = true;
+		cube.position.set(0,2,0);
+		scene.add(cube);
+
+
+		stats = new Stats();
+		stats.domElement.style.position = 'absolute';
+		stats.domElement.style.top = '0px';
+		document.body.appendChild(stats.domElement);
+		camera.position.z = 3;
+        camera.position.y = 4;
+        camera.lookAt(cube.position);
+
+        function render() {
+            requestAnimationFrame(render);
+            stats.update();
+            renderer.render(scene, camera);
+        }
+        render();
+    </script>
+</body>
+
+</html>
