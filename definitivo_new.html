@@ -42,7 +42,7 @@
     <script src="libs/OBJLoader.js"></script>
     <script src='libs/dat.gui.min.js'></script>
     <script src='libs/shaders.js'></script>
-	<link rel="import" id ="shaders" href="shaders.html">
+    <link rel="import" id="shaders" href="shaders.html">
 
     <!-- three.js code -->
 
@@ -64,11 +64,11 @@
         }
 
         var ambientLightParameters = {
-			red: 0.2,
-			green: 0.2,
-			blue: 0.2,
-			intensity: 1.0,
-		}
+            red: 0.2,
+            green: 0.2,
+            blue: 0.2,
+            intensity: 1.0,
+        }
 
         //TEXTURE FOR SHADERS
         var textureParameters = {
@@ -77,26 +77,26 @@
             repeatT: 1.0,
             normalScale: 1.0,
             displacementScale: 0.0,
-        }      
-        
+        }
+
         //MAPPE PER LA TEXTURE
-        var diffuseMap = loadTexture( "textures/diesel/Marble_Tiles_001_basecolor.jpg" );
-        var specularMap = loadTexture( "textures/diesel/Marble_Tiles_001_roughness.jpg" );
-        var roughnessMap = loadTexture( "textures/diesel/Marble_Tiles_001_roughness.jpg" );
-        var normalMap = loadTexture( "textures/diesel/Marble_Tiles_001_normal.jpg" );
-        var aoMap = loadTexture( "textures/diesel/Marble_Tiles_001_ambientOcclusion.jpg" );		
-		var displacementMap = loadTexture( "textures/diesel/Marble_Tiles_001_height.png" );
-        
+        var diffuseMap = loadTexture("textures/diesel/Marble_Tiles_001_basecolor.jpg");
+        var specularMap = loadTexture("textures/diesel/Marble_Tiles_001_roughness.jpg");
+        var roughnessMap = loadTexture("textures/diesel/Marble_Tiles_001_roughness.jpg");
+        var normalMap = loadTexture("textures/diesel/Marble_Tiles_001_normal.jpg");
+        var aoMap = loadTexture("textures/diesel/Marble_Tiles_001_ambientOcclusion.jpg");
+        var displacementMap = loadTexture("textures/diesel/Marble_Tiles_001_height.png");
+
         //CUBEMAP
         var loader = new THREE.CubeTextureLoader();
-				loader.setPath( 'textures/cubemap/' );
-				var textureCube = loader.load( [
-					'px.png', 'nx.png',
-					'py.png', 'ny.png',
-					'pz.png', 'nz.png'
-				] );
+        loader.setPath('textures/cubemap/');
+        var textureCube = loader.load([
+            'px.png', 'nx.png',
+            'py.png', 'ny.png',
+            'pz.png', 'nz.png'
+        ]);
         scene.background = textureCube;
-        
+
         //SHADER UNIFORMS
         var uniforms = {
             specularMap: { type: "t", value: specularMap },
@@ -105,38 +105,39 @@
             normalMap: { type: "t", value: normalMap },
             aoMap: { type: "t", value: aoMap },
             displacementMap: { type: "t", value: displacementMap },
-            displacementScale: { type: "f", value: 1.0 },            
+            displacementScale: { type: "f", value: 1.0 },
             normalScale: { type: "v2", value: new THREE.Vector2(1, 1) },
             pointLightPosition: { type: "v3", value: new THREE.Vector3() },
             pointLightPosition1: { type: "v3", value: new THREE.Vector3() },
+            pointLightPosition2: { type: "v3", value: new THREE.Vector3() },
             clight: { type: "v3", value: new THREE.Vector3() },
-            envMap:	{ type: "t", value: textureCube},
-            ambientLight:	{ type: "v3", value: new THREE.Vector3() },
+            envMap: { type: "t", value: textureCube },
+            ambientLight: { type: "v3", value: new THREE.Vector3() },
             textureRepeat: { type: "v2", value: new THREE.Vector2(1, 1) }
         };
-        
+
         //CODICE DEGLI SHADER PRESENTE IN shader.js
         vs = vertexShader();
         fs = fragmentShader();
 
         //PAVIMENTO
         var geo = new THREE.PlaneBufferGeometry(50, 50, 8, 8);
-        var mat = new THREE.MeshPhongMaterial({ color: 0xa89332});
+        var mat = new THREE.MeshPhongMaterial({ color: 0xa89332 });
         var plane = new THREE.Mesh(geo, mat);
-        plane.rotateX( - Math.PI / 2);
+        plane.rotateX(- Math.PI / 2);
         scene.add(plane);
-        
+
         //DEFINIZIONE MATERIALE
         var ourMaterial = new THREE.ShaderMaterial({ uniforms: uniforms, vertexShader: vs, fragmentShader: fs });
         ourMaterial.extensions.derivatives = true;
-    
+
         //carico oggetto       
         var loader = new THREE.OBJLoader();
         var seduta;
         var struttura;
         var gambe;
         var sedia = new THREE.Object3D()
-        
+
         loader.load('models/sedia.obj', function (object) {
             //object.envMap = textureCube;				
             gambe = object.children[2];
@@ -159,18 +160,18 @@
         });
 
         //LUCI
-        var light = new THREE.PointLight( 0xff0000, 0.8, 100, 2 );
-        light.position.set( 7.0, 25.0, 7.0 );
-        scene.add( light );
-        
-        var light1 = new THREE.PointLight( 0xff0000, 0.8, 100, 2 );
-        light1.position.set( -7.0, 5.0, -7.0 );
-        scene.add( light1 );
-        
-        
-        var light2 = new THREE.PointLight( 0xff0000, 0.8, 100, 2 );
-        light2.position.set( -7.0, 5.0, 7.0 );
-        scene.add( light2 );
+        var light = new THREE.PointLight(0xff0000, 0.8, 100, 2);
+        light.position.set(7.0, 25.0, 7.0);
+        scene.add(light);
+
+        var light1 = new THREE.PointLight(0xff0000, 0.8, 100, 2);
+        light1.position.set(-7.0, 5.0, -7.0);
+        scene.add(light1);
+
+
+        var light2 = new THREE.PointLight(0xff0000, 0.8, 100, 2);
+        light2.position.set(7.0, 15.0, -17.0);
+        scene.add(light2);
 
         var lightMesh = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 16),
             new THREE.MeshBasicMaterial({ color: 0xffff00, wireframe: true }));
@@ -186,6 +187,13 @@
             lightMesh1.position.y,
             lightMesh1.position.z);
 
+        var lightMesh2 = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 16),
+            new THREE.MeshBasicMaterial({ color: 0xffff00, wireframe: true }));
+        lightMesh2.position.set(7.0, 15.0, -17.0);
+        uniforms.pointLightPosition2.value = new THREE.Vector3(lightMesh2.position.x,
+            lightMesh2.position.y,
+            lightMesh2.position.z);
+
 
         var gui;
         var stats = new Stats();
@@ -193,29 +201,29 @@
 
         //FUNCTION PER IL CORRETTO CARICAMENTO DELLE TEXTURE
         function loadTexture(file) {
-				var texture = new THREE.TextureLoader().load( file , function ( texture ) {
-					texture.minFilter = THREE.LinearMipMapLinearFilter;
-					texture.anisotropy = renderer.getMaxAnisotropy();
-					texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-    			  	texture.offset.set( 0, 0 );
-					texture.needsUpdate = true;
-					render();
-				} )
-				return texture;
-		}
-        
-        
+            var texture = new THREE.TextureLoader().load(file, function (texture) {
+                texture.minFilter = THREE.LinearMipMapLinearFilter;
+                texture.anisotropy = renderer.getMaxAnisotropy();
+                texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+                texture.offset.set(0, 0);
+                texture.needsUpdate = true;
+                render();
+            })
+            return texture;
+        }
+
+
         function init() {
 
             renderer.setClearColor(0xf0f0f0);
 
             //shadowmap
             renderer.shadowMap.enabled = true;
-            renderer.shadowMap.type = THREE.PCFSoftShadowMap;           
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
             light.castShadow = true;
             light1.castShadow = true;
             light2.castShadow = true;
-            
+
             /*
             light.shadow.camera.near = 1;
             light.shadow.camera.far = 30;
@@ -233,6 +241,7 @@
             scene.add(sedia);
             scene.add(lightMesh);
             scene.add(lightMesh1);
+            scene.add(lightMesh2);
 
             document.body.appendChild(renderer.domElement);
             renderer.setPixelRatio(window.devicePixelRatio);
@@ -254,7 +263,7 @@
             document.body.appendChild(stats.domElement);
 
             ourMaterial.needsUpdate = true;
-            
+
         }
 
         function onResize() {
@@ -296,7 +305,7 @@
             textureSettings = gui.addFolder('Texture parameters');
             textureSettings.add(textureParameters, 'repeatS').min(0.1).max(10).onChange(function (newVal) { render() });
             textureSettings.add(textureParameters, 'repeatT').min(0.1).max(10).onChange(function (newVal) { render() });
-            textureSettings.add(textureParameters,'normalScale').min(-3).max(3).onChange( function( newVal ) {render()});
+            textureSettings.add(textureParameters, 'normalScale').min(-3).max(3).onChange(function (newVal) { render() });
             textureSettings.add(textureParameters, 'displacementScale').min(-3).max(3).onChange(function (newVal) { render() });
         }
 
@@ -306,10 +315,10 @@
                 lightParameters.green * lightParameters.intensity,
                 lightParameters.blue * lightParameters.intensity);
             uniforms.ambientLight.value = new THREE.Vector3(
-				ambientLightParameters.red * ambientLightParameters.intensity,
-				ambientLightParameters.green * ambientLightParameters.intensity,
-				ambientLightParameters.blue * ambientLightParameters.intensity
-			);
+                ambientLightParameters.red * ambientLightParameters.intensity,
+                ambientLightParameters.green * ambientLightParameters.intensity,
+                ambientLightParameters.blue * ambientLightParameters.intensity
+            );
             uniforms.textureRepeat.value = new THREE.Vector2(textureParameters.repeatS, textureParameters.repeatT);
             uniforms.diffuseMap.value = diffuseMap;
             uniforms.specularMap.value = specularMap;
