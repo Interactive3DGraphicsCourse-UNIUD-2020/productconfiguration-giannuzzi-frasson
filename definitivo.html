@@ -55,7 +55,7 @@
 		varying vec3 vPosition;
         varying vec2 uVv;
         varying vec3 wPosition;
-        uniform vec2 textureRepeat;
+        uniform vec2 textureRepeat;                
         
 		void main() {
             vec3 newPosition = position + normal * ((texture2D( displacementMap, uv*textureRepeat ).xyz) * displacementScale);
@@ -64,7 +64,7 @@
 			vPosition = vPos.xyz;
             vNormal = normalize(normalMatrix * normal);
             uVv = uv;
-			gl_Position = projectionMatrix * vPos;
+            gl_Position = projectionMatrix * vPos;         
 		}
 		</script>
 
@@ -89,7 +89,8 @@
 
 			vec3 cdiff;
 			vec3 cspec;
-			float roughness;
+            float roughness; 
+           
 
 			vec3 FSchlick(float lDoth) {
 				return (cspec + (vec3(1.0)-cspec)*pow(1.0 - lDoth,5.0));
@@ -183,7 +184,7 @@
                 
                 vec3 outRadiance =  (PI*clight * nDotl * BRDF * envLight) + (PI*clight * nDotl1 * BRDF1 * envLight) + ambientLight*cdiff*texture2D( aoMap, uVv*textureRepeat ).xyz;
 				// gamma encode the final value
-				gl_FragColor = vec4(pow( outRadiance, vec3(1.0/2.2)), 1.0);
+                gl_FragColor = vec4(pow( outRadiance, vec3(1.0/2.2)), 1.0);
 			}
 		</script>
 
@@ -225,6 +226,10 @@
         plane.rotateX( - Math.PI / 2);
         scene.add(plane);
 
+        var light = new THREE.PointLight( 0xff0000, 1, 100 );
+        light.position.set( 0, 20, 0 );
+        scene.add( light );
+
         var diffuseMap = loadTexture( "textures/diesel/Marble_Tiles_001_basecolor.jpg" );
         var specularMap = loadTexture( "textures/diesel/Marble_Tiles_001_roughness.jpg" );
         var roughnessMap = loadTexture( "textures/diesel/Marble_Tiles_001_roughness.jpg" );
@@ -241,7 +246,7 @@
 				] );
         scene.background = textureCube;
 
-        /*
+        
         var uniforms = {
             specularMap: { type: "t", value: specularMap },
             diffuseMap: { type: "t", value: diffuseMap },
@@ -258,8 +263,8 @@
             ambientLight:	{ type: "v3", value: new THREE.Vector3() },
             textureRepeat: { type: "v2", value: new THREE.Vector2(1, 1) }
         };
-        */
         
+        /*
         var uniforms = THREE.UniformsUtils.merge([
                 THREE.UniformsLib.shadow,
                 THREE.UniformsLib.lights,
@@ -280,12 +285,13 @@
             textureRepeat: { type: "v2", value: new THREE.Vector2(1, 1) },
             lights: true,
         }]);
+        */
         
         vs = document.getElementById("vertex").textContent;
         fs = document.getElementById("fragment").textContent;
 
         var ourMaterial = new THREE.ShaderMaterial({ uniforms: uniforms, vertexShader: vs, fragmentShader: fs });
-        ourMaterial.lights = true;
+        //ourMaterial.lights = true;
         ourMaterial.extensions.derivatives = true;
     
         //carico oggetto       
@@ -303,6 +309,14 @@
             seduta.material = ourMaterial;
             struttura.material = ourMaterial;
             gambe.material = ourMaterial;
+
+            gambe.castShadow = true;
+            struttura.castShadow = true;
+            seduta.castShadow = true;
+            gambe.receiveShadow = true;
+            struttura.receiveShadow = true;
+            seduta.receiveShadow = true;
+
             sedia.add(seduta);
             sedia.add(struttura);
             sedia.add(gambe);
@@ -348,15 +362,15 @@
             renderer.shadowMap.enabled = true;
             renderer.shadowMap.type = THREE.BasicShadowMap;           
             lightMesh.castShadow = true;
+            lightMesh1.castShadow = true;
+            light.castShadow = true;
             /*
             lightMesh.shadow.camera.near = 8;
             lightMesh.shadow.camera.far = 30;
             lightMesh.shadow.mapSize.width = 1024;
             lightMesh.shadow.mapSize.height = 1024;
             lightMesh.shadow.bias = 0.0001;
-            */
-            sedia.castShadow = true;
-            sedia.receiveShadow = true;
+            */         
             plane.castShadow = false;
             plane.receiveShadow = true;
 

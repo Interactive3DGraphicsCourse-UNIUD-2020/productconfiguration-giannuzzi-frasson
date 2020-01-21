@@ -48,35 +48,31 @@
 
     <!-- shaders -->
 
-    <script type="text/x-glsl" id="vertex">
-        attribute vec4 tangent;
-        varying vec3 vTangent;
-        varying vec3 vBitangent;
-        
+    <script type="text/x-glsl" id="vertex">               
+        uniform float displacementScale;
+        uniform sampler2D displacementMap; 
         varying vec3 vNormal;
 		varying vec3 vPosition;
-		varying vec2 uVv;
-
+        varying vec2 uVv;
+        varying vec3 wPosition;
+        uniform vec2 textureRepeat;        	
         
 		void main() {
-			vec4 vPos = modelViewMatrix * vec4( position, 1.0 );
+            vec3 newPosition = position + normal * ((texture2D( displacementMap, uv*textureRepeat ).xyz) * displacementScale);
+            wPosition = (modelMatrix * vec4( position, 1.0 )).xyz;
+			vec4 vPos = modelViewMatrix * vec4( newPosition, 1.0 );
 			vPosition = vPos.xyz;
             vNormal = normalize(normalMatrix * normal);
-            vec3 objectTangent = vec3( tangent.xyz );
-			vec3 transformedTangent = normalMatrix * objectTangent;
-			vTangent = normalize( transformedTangent );
-			vBitangent = normalize( cross( vNormal, vTangent ) * tangent.w );
             uVv = uv;
-			gl_Position = projectionMatrix * vPos;
+            gl_Position = projectionMatrix * vPos;           
 		}
 		</script>
 
-    <script type="text/x-glsl" id="fragment">
+    <script type="text/x-glsl" id="fragment">           
             varying vec3 vNormal;
-            varying vec3 vTangent;
-			varying vec3 vBitangent;
             varying vec3 vPosition;
-			varying vec2 uVv;
+            varying vec2 uVv;
+            varying vec3 wPosition;
             uniform vec3 pointLightPosition; // in world space
             uniform vec3 pointLightPosition1; // in world space
             uniform vec3 clight;
@@ -87,12 +83,13 @@
             uniform sampler2D normalMap;
             uniform sampler2D aoMap;
             uniform vec2 normalScale;
-			uniform vec2 textureRepeat;
-			const float PI = 3.14159;
+            uniform vec2 textureRepeat;
+            uniform samplerCube envMap;
+            const float PI = 3.14159;          
 
 			vec3 cdiff;
 			vec3 cspec;
-			float roughness;
+            float roughness;     	        
 
 			vec3 FSchlick(float lDoth) {
 				return (cspec + (vec3(1.0)-cspec)*pow(1.0 - lDoth,5.0));
@@ -125,12 +122,14 @@
 				mapN.xy = normalScale * mapN.xy;
 				mat3 tsn = mat3( S, T, N );
 				return normalize( tsn * mapN );
-			}
+            }
+            
+            vec3 inverseTransformDirection( in vec3 dir, in mat4 matrix ) {
+                return normalize( ( vec4( dir, 0.0 ) * matrix ).xyz );
+            }
 
-			void main() {
-                
-                vec3 n = perturbNormal2Arb(vPosition, normalize(vNormal));
-               
+			void main() {                
+                vec3 n = perturbNormal2Arb(vPosition, normalize(vNormal));                
                 vec4 lPosition = viewMatrix * vec4( pointLightPosition, 1.0 );
                 vec4 lPosition1 = viewMatrix * vec4( pointLightPosition1, 1.0 );
                 vec3 l = normalize(lPosition.xyz - vPosition.xyz);
@@ -163,7 +162,14 @@
 				cspec = texture2D( specularMap, uVv*textureRepeat ).rgb;
 				// texture in sRGB, linearize
 				cspec = pow( cspec, vec3(2.2));
-				roughness = texture2D( roughnessMap, uVv*textureRepeat).r; // no need to linearize roughness map
+                roughness = texture2D( roughnessMap, uVv*textureRepeat).r; // no need to linearize roughness map
+                
+
+                vec3 worldN = inverseTransformDirection( n, viewMatrix );
+				vec3 worldV = cameraPosition - wPosition ;
+                vec3 r = normalize( reflect(-worldV,worldN));
+                vec3 envLight = textureCube( envMap, vec3(-r.x, r.yz)).rgb;				
+				envLight = pow( envLight, vec3(2.2));
 
 				vec3 fresnel = FSchlick(lDoth);
                 vec3 fresnel1 = FSchlick(lDoth1);
@@ -172,11 +178,11 @@
                     (4.0*nDotl*nDotv);
                 
                 vec3 BRDF1 = (vec3(1.0)-fresnel1)*cdiff/PI + fresnel1*GSmith(nDotv,nDotl1)*DGGX(nDoth1,roughness*roughness)/
-					(4.0*nDotl1*nDotv);
+                    (4.0*nDotl1*nDotv);  
                 
-                vec3 outRadiance =  (PI*clight * nDotl * BRDF) + (PI*clight * nDotl1 * BRDF1) + ambientLight*cdiff*texture2D( aoMap, uVv ).xyz;
+                vec3 outRadiance =  (PI*clight * nDotl * BRDF * envLight) + (PI*clight * nDotl1 * BRDF1 * envLight) + ambientLight*cdiff*texture2D( aoMap, uVv*textureRepeat ).xyz;
 				// gamma encode the final value
-				gl_FragColor = vec4(pow( outRadiance, vec3(1.0/2.2)), 1.0);
+                gl_FragColor = vec4(pow( outRadiance, vec3(1.0/2.2)), 1.0);             
 			}
 		</script>
 
@@ -209,18 +215,26 @@
             repeatS: 1.0,
             repeatT: 1.0,
             normalScale: 1.0,
-            displacementScale: 0.5,
+            displacementScale: 0.0,
         }      
-
+      
         var diffuseMap = loadTexture( "textures/diesel/Marble_Tiles_001_basecolor.jpg" );
         var specularMap = loadTexture( "textures/diesel/Marble_Tiles_001_roughness.jpg" );
         var roughnessMap = loadTexture( "textures/diesel/Marble_Tiles_001_roughness.jpg" );
         var normalMap = loadTexture( "textures/diesel/Marble_Tiles_001_normal.jpg" );
         var aoMap = loadTexture( "textures/diesel/Marble_Tiles_001_ambientOcclusion.jpg" );		
-		var displacementMap = loadTexture( "textures/diesel/Marble_Tiles_001_height.jpg" );
+		var displacementMap = loadTexture( "textures/diesel/Marble_Tiles_001_height.png" );
 		
+        var loader = new THREE.CubeTextureLoader();
+				loader.setPath( 'textures/cubemap/' );
+				var textureCube = loader.load( [
+					'px.png', 'nx.png',
+					'py.png', 'ny.png',
+					'pz.png', 'nz.png'
+				] );
+        scene.background = textureCube;
 
-
+        
         var uniforms = {
             specularMap: { type: "t", value: specularMap },
             diffuseMap: { type: "t", value: diffuseMap },
@@ -228,31 +242,30 @@
             normalMap: { type: "t", value: normalMap },
             aoMap: { type: "t", value: aoMap },
             displacementMap: { type: "t", value: displacementMap },
+            displacementScale: { type: "f", value: 1.0 },            
             normalScale: { type: "v2", value: new THREE.Vector2(1, 1) },
             pointLightPosition: { type: "v3", value: new THREE.Vector3() },
             pointLightPosition1: { type: "v3", value: new THREE.Vector3() },
             clight: { type: "v3", value: new THREE.Vector3() },
+            envMap:	{ type: "t", value: textureCube},
             ambientLight:	{ type: "v3", value: new THREE.Vector3() },
             textureRepeat: { type: "v2", value: new THREE.Vector2(1, 1) }
         };
-
+        
+        
         vs = document.getElementById("vertex").textContent;
         fs = document.getElementById("fragment").textContent;
 
-        var ourMaterial = new THREE.ShaderMaterial({ uniforms: uniforms, vertexShader: vs, fragmentShader: fs });
+        var ourMaterial = new THREE.ShaderMaterial({ uniforms: uniforms, vertexShader: vs, fragmentShader: fs });        
         ourMaterial.extensions.derivatives = true;
-        //var ourMaterial = new THREE.MeshBasicMaterial({ map: diffuseMap });
-        geometry = new THREE.SphereBufferGeometry(2, 32, 32);
-        //geometry = new THREE.BoxGeometry( 1, 1, 1, 10,10,10);
-       // var mesh = new THREE.Mesh(geometry, ourMaterial);
-        //carico oggetto
-       
+    
+        //carico oggetto       
         var loader = new THREE.OBJLoader();
         var seduta;
         var struttura;
         var gambe;
         var sedia = new THREE.Object3D()
-
+        
         loader.load('models/sedia.obj', function (object) {
             //object.envMap = textureCube;				
             gambe = object.children[2];
@@ -266,7 +279,7 @@
             sedia.add(gambe);
             scene.add(sedia);
         });
-
+        
         var lightMesh = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 16),
             new THREE.MeshBasicMaterial({ color: 0xffff00, wireframe: true }));
         lightMesh.position.set(7.0, 7.0, 7.0);
@@ -276,7 +289,7 @@
 
         var lightMesh1 = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 16),
             new THREE.MeshBasicMaterial({ color: 0xffff00, wireframe: true }));
-        lightMesh1.position.set(7.0, -7.0, -7.0);
+        lightMesh1.position.set(-7.0, 7.0, 7.0);
         uniforms.pointLightPosition1.value = new THREE.Vector3(lightMesh1.position.x,
             lightMesh1.position.y,
             lightMesh1.position.z);
@@ -372,7 +385,7 @@
             textureSettings.add(textureParameters, 'repeatS').min(0.1).max(10).onChange(function (newVal) { render() });
             textureSettings.add(textureParameters, 'repeatT').min(0.1).max(10).onChange(function (newVal) { render() });
             textureSettings.add(textureParameters,'normalScale').min(-3).max(3).onChange( function( newVal ) {render()});
-            textureSettings.add(textureParameters, 'displacementScale').min(0).max(1).onChange(function (newVal) { render() });
+            textureSettings.add(textureParameters, 'displacementScale').min(-3).max(3).onChange(function (newVal) { render() });
         }
 
         function updateUniforms() {
@@ -392,6 +405,7 @@
             uniforms.normalMap.value = normalMap;
             uniforms.aoMap.value = aoMap;
             uniforms.displacementMap.value = displacementMap;
+            uniforms.displacementScale.value = textureParameters.displacementScale;
             uniforms.normalScale.value = new THREE.Vector2(textureParameters.normalScale, textureParameters.normalScale);
         }
 
