@@ -44,6 +44,14 @@ vec3 cdiff;
 vec3 cspec;
 float roughness;
 
+struct SpotLight {
+    vec3 color;
+    vec3 position; // light position, in camera coordinates
+    float distance; 
+};
+   
+uniform SpotLight spotLights[NUM_SPOT_LIGHTS];
+
 
 vec3 FSchlick(float lDoth) {
     return (cspec + (vec3(1.0) - cspec) * pow(1.0 - lDoth, 5.0));
@@ -85,9 +93,9 @@ vec3 inverseTransformDirection( in vec3 dir, in mat4 matrix) {
 void main() {
     
     vec3 n = perturbNormal2Arb(vPosition, normalize(vNormal));
-    vec4 lPosition = viewMatrix * vec4(pointLightPosition, 1.0);
-    vec4 lPosition1 = viewMatrix * vec4(pointLightPosition1, 1.0);
-    vec4 lPosition2 = viewMatrix * vec4(pointLightPosition1, 1.0);
+    vec4 lPosition = vec4(spotLights[0].position, 1.0);
+    vec4 lPosition1 = vec4(spotLights[1].position, 1.0);
+    vec4 lPosition2 = vec4(spotLights[2].position, 1.0);
     vec3 l = normalize(lPosition.xyz - vPosition.xyz);
     vec3 l1 = normalize(lPosition1.xyz - vPosition.xyz);
     vec3 l2 = normalize(lPosition2.xyz - vPosition.xyz);
