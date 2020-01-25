@@ -178,7 +178,7 @@
     var canvass = $('#canvass')[0];
     var parent = $('#parent')[0];
     console.log(canvass);
-    //var renderer = new THREE.WebGLRenderer({ canvas: canvass, antialiasing: true });
+    var renderer = new THREE.WebGLRenderer({ canvas: canvass, antialiasing: true });
     renderer.setViewport(0,0, parent.width, parent.height);
     var camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1, 1000);
     var controls = new THREE.OrbitControls(camera, renderer.domElement);
