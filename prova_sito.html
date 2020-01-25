@@ -53,10 +53,8 @@
           <div class="row">
 
             <div class="col-md-6">
-              <div class="product service-image-left">
-
-
-                <img id="item-display" src="textures\diesel\Material_1256.png" alt=""></img>
+              <div class="product" id="parent">
+                <canvas id="canvass" width="100" height="300"></canvas>
               </div>
             </div>
             <!--
@@ -77,8 +75,10 @@
             </div>  -->
             <div class="col-md-6">
               <div class="product-title"> <b>Rock Chair</b> | Diesel with Moroso</div>
-              <div class="product-desc">by Diesel Creative Team, 2010 Collection, in collaboration with Moroso. 
-                Rock Chair Inspired by the beautiful geometric structure of crystals and minerals which Nature creates in amazingly complex yet perfect formations, the Rock Chair combines the power and distinctive look of its sharp edges with the simple, ergonomic functionality of its seat.</div>
+              <div class="product-desc">by Diesel Creative Team, 2010 Collection, in collaboration with Moroso.
+                Rock Chair Inspired by the beautiful geometric structure of crystals and minerals which Nature creates
+                in amazingly complex yet perfect formations, the Rock Chair combines the power and distinctive look of
+                its sharp edges with the simple, ergonomic functionality of its seat.</div>
               <div class="product-rating"><i class="fa fa-star gold"></i> <i class="fa fa-star gold"></i> <i
                   class="fa fa-star gold"></i> <i class="fa fa-star gold"></i> <i class="fa fa-star-o"></i> </div>
               <hr>
@@ -99,7 +99,7 @@
             </div>
           </div>
 
-          
+
         </div>
       </div>
       <div class="container-fluid">
@@ -164,6 +164,451 @@
   <script src="js/jquery-3.4.1.slim.min.js"></script>
   <script src="js/popper.min.js"></script>
   <script src="js/bootstrap.min.js"></script>
+
+  <script src="libs/three.min.js"></script>
+  <script src="libs/stats.min.js"></script>
+  <script src="libs/OrbitControls.js"></script>
+  <script src="libs/OBJLoader.js"></script>
+  <script src='libs/dat.gui.min.js'></script>
+  <script src='libs/shaders.js'></script>
+
+  <!-- three.js code -->
+
+  <script>
+    var canvass = $('#canvass')[0];
+    var parent = $('#parent')[0];
+    console.log(canvass);
+    //var renderer = new THREE.WebGLRenderer({ canvas: canvass, antialiasing: true });
+    renderer.setViewport(0,0, parent.width, parent.height);
+    var camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1, 1000);
+    var controls = new THREE.OrbitControls(camera, renderer.domElement);
+    var scene = new THREE.Scene();
+
+    //LIGHTS FOR SHADER
+
+    // default: white, 1.0 intensity
+    var lightParameters = {
+      red: 1.0,
+      green: 1.0,
+      blue: 1.0,
+      intensity: 1.0,
+    }
+
+    var ambientLightParameters = {
+      red: 0.2,
+      green: 0.2,
+      blue: 0.2,
+      intensity: 1.0,
+    }
+
+    //TEXTURE FOR SHADERS
+    var textureParameters = {
+      material: "Marble_Tiles_001",
+      repeatS: 1.0,
+      repeatT: 1.0,
+      normalScale: 1.0,
+      displacementScale: 0.0,
+    }
+
+    var textureParameters1 = {
+      material: "Marble_Tiles_001",
+      repeatS: 1.0,
+      repeatT: 1.0,
+      normalScale: 1.0,
+      displacementScale: 0.0,
+    }
+
+    var textureParameters1 = {
+      material: "Fabric_Burlap_003",
+      repeatS: 1.0,
+      repeatT: 1.0,
+      normalScale: 1.0,
+      displacementScale: 0.0,
+    }
+
+    //MATERIAL PARAMETER
+    // default: gold
+    var cspecGOLDEN = {
+      red: 1.0,
+      green: 0.71,
+      blue: 0.29,
+      roughness: 0.54
+    }
+
+    //FUNCTION PER IL CORRETTO CARICAMENTO DELLE TEXTURE
+    function loadTexture(file) {
+      var texture = new THREE.TextureLoader().load(file, function (texture) {
+        texture.minFilter = THREE.LinearMipMapLinearFilter;
+        texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+        texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+        texture.offset.set(0, 0);
+        texture.needsUpdate = true;
+        render();
+      })
+      return texture;
+    }
+
+    //MAPPE PER LA TEXTURE
+    var diffuseMap = loadTexture("textures/diesel/Marble_Tiles_001_basecolor.jpg");
+    var specularMap = loadTexture("textures/diesel/Marble_Tiles_001_roughness.jpg");
+    var roughnessMap = loadTexture("textures/diesel/Marble_Tiles_001_roughness.jpg");
+    var normalMap = loadTexture("textures/diesel/Marble_Tiles_001_normal.jpg");
+    var aoMap = loadTexture("textures/diesel/Marble_Tiles_001_ambientOcclusion.jpg");
+    var displacementMap = loadTexture("textures/diesel/Marble_Tiles_001_height.png");
+
+    var diffuseMap1 = loadTexture("textures/diesel/Fabric_Burlap_003_basecolor.jpg");
+    var specularMap1 = loadTexture("textures/diesel/Fabric_Burlap_003_roughness.jpg");
+    var roughnessMap1 = loadTexture("textures/diesel/Fabric_Burlap_003_roughness.jpg");
+    var normalMap1 = loadTexture("textures/diesel/Fabric_Burlap_003_normal.jpg");
+    var aoMap1 = loadTexture("textures/diesel/Fabric_Burlap_003_ambientOcclusion.jpg");
+    var displacementMap1 = loadTexture("textures/diesel/Fabric_Burlap_003_height.png");
+
+    //CUBEMAP
+    var loader = new THREE.CubeTextureLoader();
+    loader.setPath('textures/cubemap2/');
+    var textureCube = loader.load([
+      'px.png', 'nx.png',
+      'py.png', 'ny.png',
+      'pz.png', 'nz.png'
+    ]);
+    scene.background = textureCube;
+
+    //SHADER UNIFORMS
+    var uniforms = {
+      uniforms: THREE.UniformsUtils.merge([
+        THREE.UniformsLib['lights'],
+        {
+          lightIntensity: { type: 'f', value: 1.0 },
+        }
+      ]),
+      specularMap: { type: "t", value: specularMap1 },
+      diffuseMap: { type: "t", value: diffuseMap },
+      roughnessMap: { type: "t", value: roughnessMap },
+      normalMap: { type: "t", value: normalMap },
+      aoMap: { type: "t", value: aoMap },
+      displacementMap: { type: "t", value: displacementMap },
+      displacementScale: { type: "f", value: 0.0 },
+      normalScale: { type: "v2", value: new THREE.Vector2(1, 1) },
+      spotLightPosition: { type: "v3", value: new THREE.Vector3() },
+      spotLightPosition1: { type: "v3", value: new THREE.Vector3() },
+      spotLightPosition2: { type: "v3", value: new THREE.Vector3() },
+      clight: { type: "v3", value: new THREE.Vector3() },
+      envMap: { type: "t", value: textureCube },
+      ambientLight: { type: "v3", value: new THREE.Vector3() },
+      textureRepeat: { type: "v2", value: new THREE.Vector2(1, 1) },
+      lights: true,
+    };
+
+    var uniforms1 = {
+      uniforms: THREE.UniformsUtils.merge([
+        THREE.UniformsLib['lights'],
+        {
+          lightIntensity: { type: 'f', value: 1.0 },
+        }
+      ]),
+      specularMap: { type: "t", value: specularMap1 },
+      diffuseMap: { type: "t", value: diffuseMap1 },
+      roughnessMap: { type: "t", value: roughnessMap1 },
+      normalMap: { type: "t", value: normalMap1 },
+      aoMap: { type: "t", value: aoMap1 },
+      displacementMap: { type: "t", value: displacementMap1 },
+      displacementScale: { type: "f", value: 0.0 },
+      normalScale: { type: "v2", value: new THREE.Vector2(1, 1) },
+      spotLightPosition: { type: "v3", value: new THREE.Vector3() },
+      spotLightPosition1: { type: "v3", value: new THREE.Vector3() },
+      spotLightPosition2: { type: "v3", value: new THREE.Vector3() },
+      clight: { type: "v3", value: new THREE.Vector3() },
+      envMap: { type: "t", value: textureCube },
+      ambientLight: { type: "v3", value: new THREE.Vector3() },
+      textureRepeat: { type: "v2", value: new THREE.Vector2(1, 1) },
+      lights: true,
+    };
+
+    var uniformsGOLDEN = {
+      cspec: { type: "v3", value: new THREE.Vector3() },
+      roughness: { type: "f", value: 0.5 },
+      pointLightPosition: { type: "v3", value: new THREE.Vector3() },
+      pointLightPosition1: { type: "v3", value: new THREE.Vector3() },
+      pointLightPosition2: { type: "v3", value: new THREE.Vector3() },
+      clight: { type: "v3", value: new THREE.Vector3() },
+    };
+    //CODICE DEGLI SHADER PRESENTE IN shader.js
+    vs = vertexShader();
+    fs = fragmentShader();
+    fs1 = fragmentShader1();
+    fsGOLDEN = fragmentShaderGOLDEN();
+
+    //PAVIMENTO
+    var geo = new THREE.PlaneGeometry(1000, 1000, 100, 100);
+    var mat = new THREE.MeshPhongMaterial({ color: 0xffffff });
+    var plane = new THREE.Mesh(geo, mat);
+    plane.rotateX(- Math.PI / 2);
+    scene.add(plane);
+    plane.castShadow = false;
+    plane.receiveShadow = true;
+
+    //DEFINIZIONE MATERIALE
+    var ourMaterial = new THREE.ShaderMaterial({ uniforms: uniforms, vertexShader: vs, fragmentShader: fs });
+    ourMaterial.extensions.derivatives = true;
+    var ourMaterial1 = new THREE.ShaderMaterial({ uniforms: uniforms1, vertexShader: vs, fragmentShader: fs1 });
+    ourMaterial1.extensions.derivatives = true;
+    var ourMaterialGOLDEN = new THREE.ShaderMaterial({ uniforms: uniformsGOLDEN, vertexShader: vs, fragmentShader: fsGOLDEN });
+    ourMaterialGOLDEN.extensions.derivatives = true;
+
+
+    //carico oggetto       
+    var loader = new THREE.OBJLoader();
+    var seduta;
+    var struttura;
+    var gambe;
+    var sedia = new THREE.Object3D()
+
+    loader.load('models/sedia.obj', function (object) {
+      //object.envMap = textureCube;				
+      gambe = object.children[2];
+      struttura = object.children[1];
+      seduta = object.children[0];
+      seduta.material = ourMaterial1;
+      struttura.material = ourMaterial;
+      gambe.material = ourMaterialGOLDEN;
+
+      gambe.castShadow = true;
+      struttura.castShadow = true;
+      seduta.castShadow = true;
+      gambe.receiveShadow = true;
+      struttura.receiveShadow = true;
+      seduta.receiveShadow = true;
+
+      sedia.add(seduta);
+      sedia.add(struttura);
+      sedia.add(gambe);
+    });
+
+    /*
+    //LUCI        
+hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.2 );
+hemiLight.color.setHSL( 0.6, 1, 0.6 );
+hemiLight.groundColor.setHSL( 0.095, 1, 0.75 );
+hemiLight.position.set( 0, 50, 0 );
+    scene.add( hemiLight );
+    
+    dirLight = new THREE.DirectionalLight( 0xffffff, 1 );
+dirLight.color.setHSL( 0.1, 1, 0.95 );
+dirLight.position.set( - 1, 1.75, 1 );
+dirLight.position.multiplyScalar( 30 );
+scene.add( dirLight );
+dirLight.castShadow = true;
+dirLight.shadow.mapSize.width = 1024;
+dirLight.shadow.mapSize.height = 1024;
+dirLight.shadow.camera.far = 3500;
+dirLight.shadow.bias = - 0.0001;
+    */
+
+    var light = new THREE.SpotLight(0xffffff, 0.8, 100, Math.PI / 2, 0.2, 2);//SpotLight( color : Integer, intensity : Float, distance : Float, angle : Radians, penumbra : Float, decay : Float )
+    light.position.set(0.0, 25.0, -10.0);
+    scene.add(light);
+
+    var light1 = new THREE.SpotLight(0xd1e264, 0.8, 100, Math.PI / 3, 1, 8);
+    light1.position.set(22.0, 19.0, -11.0);
+    scene.add(light1);
+
+
+    var light2 = new THREE.SpotLight(0x0f4c81, 0.8, 100, Math.PI / 3, 0.9, 6);
+    light2.position.set(-28.0, 15.0, 3.0);
+    scene.add(light2);
+
+    uniforms.spotLightPosition.value = light.position;
+    uniforms.spotLightPosition1.value = light1.position;
+    uniforms.spotLightPosition2.value = light2.position;
+
+    uniforms1.spotLightPosition.value = light.position;
+    uniforms1.spotLightPosition1.value = light1.position;
+    uniforms1.spotLightPosition2.value = light2.position;
+
+    uniformsGOLDEN.pointLightPosition.value = light.position;
+    uniformsGOLDEN.pointLightPosition1.value = light1.position;
+    uniformsGOLDEN.pointLightPosition2.value = light2.position;
+
+    //modifico target delle luci altrimenti punta a (0, 0, 0);
+    var targetObject = new THREE.Object3D();
+    targetObject.position.x = 2;
+    targetObject.position.y = 5;
+    targetObject.position.z = 2;
+    scene.add(targetObject);
+    light1.target = targetObject;
+    var targetObject2 = new THREE.Object3D();
+    targetObject2.position.x = -3;
+    targetObject2.position.y = 4;
+    targetObject2.position.z = 2;
+    scene.add(targetObject2);
+    light2.target = targetObject2;
+
+
+    var gui;
+    var stats = new Stats();
+
+
+    function init() {
+
+      renderer.setClearColor(0xf0f0f0);
+
+      //shadowmap
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      light.castShadow = true;
+      light1.castShadow = true;
+      light2.castShadow = true;
+
+      light.shadow.mapSize.width = 1024;
+      light.shadow.mapSize.height = 1024;
+      light1.shadow.mapSize.width = 1024;
+      light1.shadow.mapSize.height = 1024;
+      light2.shadow.mapSize.width = 1024;
+      light2.shadow.mapSize.height = 1024;
+
+      /*
+      //debug luci
+      var helper = new THREE.CameraHelper( light.shadow.camera );
+      scene.add( helper );
+      var helper2 = new THREE.CameraHelper( light1.shadow.camera );
+      scene.add( helper2 );
+      var helper3 = new THREE.CameraHelper( light2.shadow.camera );
+      scene.add( helper3 );          
+      */
+
+
+      camera.position.set(0, 20, 40);
+      scene.add(camera);
+      scene.add(sedia);
+
+
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.setSize(window.innerWidth, window.innerHeight);
+
+      controls.addEventListener('change', render);
+      controls.minDistance = 1;
+      controls.maxDistance = 100;
+      //controls.maxPolarAngle = Math.PI / 2;
+      controls.enablePan = false;
+      controls.target.copy(sedia.position);
+      controls.update();
+
+      window.addEventListener('resize', onResize, false);
+
+
+      stats.domElement.style.position = 'absolute';
+      stats.domElement.style.top = '0px';
+
+
+      ourMaterial.needsUpdate = true;
+
+    }
+
+    function onResize() {
+
+      renderer.setSize(canvass.innerWidth, canvass.innerHeight);
+      camera.aspect = (canvass.innerWidth / canvass.innerHeight);
+      camera.updateProjectionMatrix();
+
+    }
+
+    function update() {
+      requestAnimationFrame(update);
+      stats.update();
+    }
+
+    function render() {
+      updateUniforms();
+      renderer.render(scene, camera);
+
+    }
+
+    function clearGui() {
+
+      if (gui) gui.destroy();
+      gui = new dat.GUI();
+      gui.open();
+
+    }
+
+    function buildGui() {
+
+      clearGui();
+      lightSettings = gui.addFolder('Light Parameters');
+      lightSettings.add(lightParameters, 'red').min(0).max(1).onChange(function (newVal) { render() });
+      lightSettings.add(lightParameters, 'green').min(0).max(1).onChange(function (newVal) { render() });
+      lightSettings.add(lightParameters, 'blue').min(0).max(1).onChange(function (newVal) { render() });
+      lightSettings.add(lightParameters, 'intensity').min(0).max(3).onChange(function (newVal) { render() });
+
+      textureSettings = gui.addFolder('Texture parameters');
+      textureSettings.add(textureParameters, 'repeatS').min(0.1).max(10).onChange(function (newVal) { render() });
+      textureSettings.add(textureParameters, 'repeatT').min(0.1).max(10).onChange(function (newVal) { render() });
+      textureSettings.add(textureParameters, 'normalScale').min(-3).max(3).onChange(function (newVal) { render() });
+      textureSettings.add(textureParameters, 'displacementScale').min(-3).max(3).onChange(function (newVal) { render() });
+
+      textureSettings1 = gui.addFolder('Texture parameters1');
+      textureSettings1.add(textureParameters1, 'repeatS').min(0.1).max(10).onChange(function (newVal) { render() });
+      textureSettings1.add(textureParameters1, 'repeatT').min(0.1).max(10).onChange(function (newVal) { render() });
+      textureSettings1.add(textureParameters1, 'normalScale').min(-3).max(3).onChange(function (newVal) { render() });
+      textureSettings1.add(textureParameters1, 'displacementScale').min(-3).max(3).onChange(function (newVal) { render() });
+
+    }
+
+
+    function updateUniforms() {
+      uniforms.clight.value = new THREE.Vector3(
+        lightParameters.red * lightParameters.intensity,
+        lightParameters.green * lightParameters.intensity,
+        lightParameters.blue * lightParameters.intensity);
+      uniforms.ambientLight.value = new THREE.Vector3(
+        ambientLightParameters.red * ambientLightParameters.intensity,
+        ambientLightParameters.green * ambientLightParameters.intensity,
+        ambientLightParameters.blue * ambientLightParameters.intensity
+      );
+      uniforms.textureRepeat.value = new THREE.Vector2(textureParameters.repeatS, textureParameters.repeatT);
+      uniforms.diffuseMap.value = diffuseMap;
+      uniforms.specularMap.value = specularMap;
+      uniforms.roughnessMap.value = roughnessMap;
+      uniforms.normalMap.value = normalMap;
+      uniforms.aoMap.value = aoMap;
+      uniforms.displacementMap.value = displacementMap;
+      uniforms.displacementScale.value = textureParameters.displacementScale;
+      uniforms.normalScale.value = new THREE.Vector2(textureParameters.normalScale, textureParameters.normalScale);
+
+      uniforms1.clight.value = new THREE.Vector3(
+        lightParameters.red * lightParameters.intensity,
+        lightParameters.green * lightParameters.intensity,
+        lightParameters.blue * lightParameters.intensity);
+      uniforms1.ambientLight.value = new THREE.Vector3(
+        ambientLightParameters.red * ambientLightParameters.intensity,
+        ambientLightParameters.green * ambientLightParameters.intensity,
+        ambientLightParameters.blue * ambientLightParameters.intensity
+      );
+      uniforms1.textureRepeat.value = new THREE.Vector2(textureParameters1.repeatS, textureParameters1.repeatT);
+      uniforms1.diffuseMap.value = diffuseMap1;
+      uniforms1.specularMap.value = specularMap1;
+      uniforms1.roughnessMap.value = roughnessMap1;
+      uniforms1.normalMap.value = normalMap1;
+      uniforms1.aoMap.value = aoMap1;
+      uniforms1.displacementMap.value = displacementMap1;
+      uniforms1.displacementScale.value = textureParameters1.displacementScale;
+      uniforms1.normalScale.value = new THREE.Vector2(textureParameters1.normalScale, textureParameters1.normalScale);
+
+      uniformsGOLDEN.cspec.value = new THREE.Vector3(cspecGOLDEN.red, cspecGOLDEN.green, cspecGOLDEN.blue);
+      uniformsGOLDEN.roughness.value = cspecGOLDEN.roughness > 0.0 ? cspecGOLDEN.roughness : 0.01;
+      uniformsGOLDEN.clight.value = new THREE.Vector3(
+        lightParameters.red * lightParameters.intensity,
+        lightParameters.green * lightParameters.intensity,
+        lightParameters.blue * lightParameters.intensity);
+    }
+
+    init();
+    buildGui();
+    update();
+    render();
+
+  </script>
 </body>
+
 
 </html>
