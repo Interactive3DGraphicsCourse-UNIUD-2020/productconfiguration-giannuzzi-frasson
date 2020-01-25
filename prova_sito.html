@@ -177,10 +177,8 @@
   <script>
     var canvass = $('#canvass')[0];
     var parent = $('#parent')[0];
-    console.log(canvass);
     var renderer = new THREE.WebGLRenderer({ canvas: canvass, antialiasing: true });
-    renderer.setViewport(0,0, parent.width, parent.height);
-    var camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1, 1000);
+    var camera = new THREE.PerspectiveCamera(45, parent.clientWidth / parent.clientHeight, 1, 1000);
     var controls = new THREE.OrbitControls(camera, renderer.domElement);
     var scene = new THREE.Scene();
 
@@ -382,6 +380,7 @@
       sedia.add(seduta);
       sedia.add(struttura);
       sedia.add(gambe);
+      render();
     });
 
     /*
@@ -481,9 +480,9 @@ dirLight.shadow.bias = - 0.0001;
       scene.add(camera);
       scene.add(sedia);
 
-
-      renderer.setPixelRatio(window.devicePixelRatio);
-      renderer.setSize(window.innerWidth, window.innerHeight);
+      //IMPOSTIAMO QUI LE INFO DELLA CANVAS
+      renderer.setPixelRatio(10);
+      //renderer.setSize(window.innerWidth, window.innerHeight);
 
       controls.addEventListener('change', render);
       controls.minDistance = 1;
@@ -506,10 +505,10 @@ dirLight.shadow.bias = - 0.0001;
 
     function onResize() {
 
-      renderer.setSize(canvass.innerWidth, canvass.innerHeight);
-      camera.aspect = (canvass.innerWidth / canvass.innerHeight);
+      renderer.setSize(parent.clientWidth, parent.clientHeight);
+      camera.aspect = (parent.clientWidth / parent.clientHeight);
       camera.updateProjectionMatrix();
-
+      render();
     }
 
     function update() {
