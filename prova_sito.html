@@ -70,21 +70,21 @@
               <br>
               <div class="product-desc"><b>Legs material:</b></div>
               <form action="">
-                <input type="radio" name="legs" value="texture"> Wood
-                <input type="radio" name="legs" value="golden"> Golden
-                <input type="radio" name="legs" value="plastic"> Plastic
+                <input type="radio" name="legs" value="l-texture" checked="checked"> Wood
+                <input type="radio" name="legs" value="l-golden"> Golden
+                <input type="radio" name="legs" value="l-plastic"> Plastic
               </form>
               <div class="product-desc"><b>Seat material:</b></div>
               <form action="">
-                <input type="radio" name="legs" value="texture"> Fabric
-                <input type="radio" name="legs" value="golden"> Golden
-                <input type="radio" name="legs" value="plastic"> Plastic
+                <input type="radio" name="seat" value="s-texture" checked="checked"> Pillow
+                <input type="radio" name="seat" value="s-golden"> Golden
+                <input type="radio" name="seat" value="s-plastic"> Plastic
               </form>
               <div class="product-desc"><b>Structure material:</b></div>
               <form action="">
-                <input type="radio" name="legs" value="texture"> Metal
-                <input type="radio" name="legs" value="golden"> Golden
-                <input type="radio" name="legs" value="plastic"> Plastic
+                <input type="radio" name="structure" value="st-texture" checked="checked"> Metal
+                <input type="radio" name="structure" value="st-golden"> Golden
+                <input type="radio" name="structure" value="st-plastic"> Plastic
               </form>
               <hr>
               <div class="product-price">$ 368.00</div>
@@ -213,18 +213,18 @@
     }
 
     var textureParameters1 = {
-      material: "Marble_Tiles_001",
-      repeatS: 1.0,
-      repeatT: 1.0,
-      normalScale: 1.0,
-      displacementScale: 0.0,
+      material: "Fabric_Padded_004_",
+      repeatS: 0.2,
+      repeatT: 0.2,
+      normalScale: 3.0,
+      displacementScale: 0.3,
     }
 
-    var textureParameters1 = {
-      material: "Fabric_Burlap_003",
-      repeatS: 1.0,
-      repeatT: 1.0,
-      normalScale: 1.0,
+    var textureParameters2 = {
+      material: "Wood_007_",
+      repeatS: 0.3,
+      repeatT: 1.5,
+      normalScale: 2.0,
       displacementScale: 0.0,
     }
 
@@ -245,7 +245,7 @@
       cspec_red: 0.04,
       cspec_green: 0.04,
       cspec_blue: 0.04,
-      roughness: 0.3
+      roughness: 0.10
     }
 
     //FUNCTION PER IL CORRETTO CARICAMENTO DELLE TEXTURE
@@ -262,19 +262,27 @@
     }
 
     //MAPPE PER LA TEXTURE
-    var diffuseMap = loadTexture("textures/diesel/Marble_Tiles_001_basecolor.jpg");
-    var specularMap = loadTexture("textures/diesel/Marble_Tiles_001_roughness.jpg");
-    var roughnessMap = loadTexture("textures/diesel/Marble_Tiles_001_roughness.jpg");
-    var normalMap = loadTexture("textures/diesel/Marble_Tiles_001_normal.jpg");
-    var aoMap = loadTexture("textures/diesel/Marble_Tiles_001_ambientOcclusion.jpg");
-    var displacementMap = loadTexture("textures/diesel/Marble_Tiles_001_height.png");
+    var diffuseMap = loadTexture("textures/diesel/Metal_Painted_001_basecolor.jpg");
+    var specularMap = loadTexture("textures/diesel/Metal_Painted_001_roughness.jpg");
+    var roughnessMap = loadTexture("textures/diesel/Metal_Painted_001_roughness.jpg");
+    var normalMap = loadTexture("textures/diesel/Metal_Painted_001_normal.jpg");
+    var aoMap = loadTexture("textures/diesel/Metal_Painted_001_ambientOcclusion.jpg");
+    var displacementMap = loadTexture("textures/diesel/Metal_Painted_001_height.png");
 
-    var diffuseMap1 = loadTexture("textures/diesel/Fabric_Burlap_003_basecolor.jpg");
-    var specularMap1 = loadTexture("textures/diesel/Fabric_Burlap_003_roughness.jpg");
-    var roughnessMap1 = loadTexture("textures/diesel/Fabric_Burlap_003_roughness.jpg");
-    var normalMap1 = loadTexture("textures/diesel/Fabric_Burlap_003_normal.jpg");
-    var aoMap1 = loadTexture("textures/diesel/Fabric_Burlap_003_ambientOcclusion.jpg");
-    var displacementMap1 = loadTexture("textures/diesel/Fabric_Burlap_003_height.png");
+    var diffuseMap1 = loadTexture("textures/diesel/Fabric_Padded_004_basecolor.jpg");
+    var specularMap1 = loadTexture("textures/diesel/Fabric_Padded_004_roughness.jpg");
+    var roughnessMap1 = loadTexture("textures/diesel/Fabric_Padded_004_roughness.jpg");
+    var normalMap1 = loadTexture("textures/diesel/Fabric_Padded_004_normal.jpg");
+    var aoMap1 = loadTexture("textures/diesel/Fabric_Padded_004_ambientOcclusion.jpg");
+    var displacementMap1 = loadTexture("textures/diesel/Fabric_Padded_004_height.png");
+
+    var diffuseMap2 = loadTexture("textures/diesel/Old_Wood_001_COLOR.jpg");
+    var specularMap2 = loadTexture("textures/diesel/Old_Wood_001_ROUGH.jpg");
+    var roughnessMap2 = loadTexture("textures/diesel/Old_Wood_001_ROUGH.jpg");
+    var normalMap2 = loadTexture("textures/diesel/Old_Wood_001_NORM.jpg");
+    var aoMap2 = loadTexture("textures/diesel/Old_Wood_001_OCC.jpg");
+    var displacementMap2 = loadTexture("textures/diesel/Old_Wood_001_DISP.png");
+
 
     //CUBEMAP
     var loader = new THREE.CubeTextureLoader();
@@ -326,10 +334,35 @@
       aoMap: { type: "t", value: aoMap1 },
       displacementMap: { type: "t", value: displacementMap1 },
       displacementScale: { type: "f", value: 0.0 },
-      normalScale: { type: "v2", value: new THREE.Vector2(1, 1) },
+      normalScale: { type: "v2", value: new THREE.Vector2(2, 2) },
       spotLightPosition: { type: "v3", value: new THREE.Vector3() },
       spotLightPosition1: { type: "v3", value: new THREE.Vector3() },
       spotLightPosition2: { type: "v3", value: new THREE.Vector3() },
+      clight: { type: "v3", value: new THREE.Vector3() },
+      envMap: { type: "t", value: textureCube },
+      ambientLight: { type: "v3", value: new THREE.Vector3() },
+      textureRepeat: { type: "v2", value: new THREE.Vector2(0.3, 0.3) },
+      lights: true,
+    };
+
+    var uniforms2 = {
+      uniforms: THREE.UniformsUtils.merge([
+        THREE.UniformsLib['lights'],
+        {
+          lightIntensity: { type: 'f', value: 1.0 },
+        }
+      ]),
+      specularMap: { type: "t", value: specularMap2 },
+      diffuseMap: { type: "t", value: diffuseMap2 },
+      roughnessMap: { type: "t", value: roughnessMap2 },
+      normalMap: { type: "t", value: normalMap2 },
+      aoMap: { type: "t", value: aoMap1 },
+      displacementMap: { type: "t", value: displacementMap2 },
+      displacementScale: { type: "f", value: 0.0 },
+      normalScale: { type: "v2", value: new THREE.Vector2(1, 1) },
+      pointLightPosition: { type: "v3", value: new THREE.Vector3() },
+      pointLightPosition1: { type: "v3", value: new THREE.Vector3() },
+      pointLightPosition2: { type: "v3", value: new THREE.Vector3() },
       clight: { type: "v3", value: new THREE.Vector3() },
       envMap: { type: "t", value: textureCube },
       ambientLight: { type: "v3", value: new THREE.Vector3() },
@@ -377,11 +410,11 @@
     ourMaterial.extensions.derivatives = true;
     var ourMaterial1 = new THREE.ShaderMaterial({ uniforms: uniforms1, vertexShader: vs, fragmentShader: fs1 });
     ourMaterial1.extensions.derivatives = true;
+    var ourMaterial2 = new THREE.ShaderMaterial({ uniforms: uniforms2, vertexShader: vs, fragmentShader: fs1 });
+    ourMaterial2.extensions.derivatives = true;
     var ourMaterialGOLDEN = new THREE.ShaderMaterial({ uniforms: uniformsGOLDEN, vertexShader: vs, fragmentShader: fsGOLDEN });
     ourMaterialGOLDEN.extensions.derivatives = true;
     var ourMaterialPlastic = new THREE.ShaderMaterial({ uniforms: uniformsPlastic, vertexShader: vs, fragmentShader: fsPlastic });
-    ourMaterial1.extensions.derivatives = true;
-
 
     //carico oggetto       
     var loader = new THREE.OBJLoader();
@@ -396,8 +429,8 @@
       struttura = object.children[1];
       seduta = object.children[0];
       seduta.material = ourMaterial1;
-      struttura.material = ourMaterialPlastic;
-      gambe.material = ourMaterialGOLDEN;
+      struttura.material = ourMaterial;
+      gambe.material = ourMaterial2;
 
       gambe.castShadow = true;
       struttura.castShadow = true;
@@ -452,6 +485,10 @@ dirLight.shadow.bias = - 0.0001;
     uniforms1.spotLightPosition.value = light.position;
     uniforms1.spotLightPosition1.value = light1.position;
     uniforms1.spotLightPosition2.value = light2.position;
+
+    uniforms2.pointLightPosition.value = light.position;
+    uniforms2.pointLightPosition1.value = light1.position;
+    uniforms2.pointLightPosition2.value = light2.position;
 
     uniformsGOLDEN.pointLightPosition.value = light.position;
     uniformsGOLDEN.pointLightPosition1.value = light1.position;
@@ -588,6 +625,12 @@ dirLight.shadow.bias = - 0.0001;
       textureSettings1.add(textureParameters1, 'normalScale').min(-3).max(3).onChange(function (newVal) { render() });
       textureSettings1.add(textureParameters1, 'displacementScale').min(-3).max(3).onChange(function (newVal) { render() });
 
+      textureSettings2 = gui.addFolder('Texture parameters2');
+      textureSettings2.add(textureParameters2, 'repeatS').min(0.1).max(10).onChange(function (newVal) { render() });
+      textureSettings2.add(textureParameters2, 'repeatT').min(0.1).max(10).onChange(function (newVal) { render() });
+      textureSettings2.add(textureParameters2, 'normalScale').min(-3).max(3).onChange(function (newVal) { render() });
+      textureSettings2.add(textureParameters2, 'displacementScale').min(-3).max(3).onChange(function (newVal) { render() });
+
       parent.appendChild(gui.domElement);
     }
 
@@ -631,6 +674,27 @@ dirLight.shadow.bias = - 0.0001;
       uniforms1.displacementScale.value = textureParameters1.displacementScale;
       uniforms1.normalScale.value = new THREE.Vector2(textureParameters1.normalScale, textureParameters1.normalScale);
 
+      uniforms2.clight.value = new THREE.Vector3(
+        lightParameters.red * lightParameters.intensity,
+        lightParameters.green * lightParameters.intensity,
+        lightParameters.blue * lightParameters.intensity);
+      uniforms2.ambientLight.value = new THREE.Vector3(
+        ambientLightParameters.red * ambientLightParameters.intensity,
+        ambientLightParameters.green * ambientLightParameters.intensity,
+        ambientLightParameters.blue * ambientLightParameters.intensity
+      );
+      uniforms2.textureRepeat.value = new THREE.Vector2(textureParameters2.repeatS, textureParameters2.repeatT);
+      uniforms2.textureRepeat.value = new THREE.Vector2(textureParameters2.repeatS, textureParameters2.repeatT);
+      uniforms2.diffuseMap.value = diffuseMap2;
+      uniforms2.specularMap.value = specularMap2;
+      uniforms2.roughnessMap.value = roughnessMap2;
+      uniforms2.normalMap.value = normalMap2;
+      uniforms2.aoMap.value = aoMap2;
+      uniforms2.displacementMap.value = displacementMap2;
+      uniforms2.displacementScale.value = textureParameters2.displacementScale;
+      uniforms2.normalScale.value = new THREE.Vector2(textureParameters2.normalScale, textureParameters2.normalScale);
+
+
       uniformsGOLDEN.cspec.value = new THREE.Vector3(cspecGOLDEN.red, cspecGOLDEN.green, cspecGOLDEN.blue);
       uniformsGOLDEN.roughness.value = cspecGOLDEN.roughness > 0.0 ? cspecGOLDEN.roughness : 0.01;
       uniformsGOLDEN.clight.value = new THREE.Vector3(
@@ -656,6 +720,43 @@ dirLight.shadow.bias = - 0.0001;
     update();
     render();
 
+    $(document).ready(function () {
+      $('input[type=radio]').click(function () {
+        switch (this.value) {
+          case "l-texture":
+            gambe.material = ourMaterial2;
+            break;
+          case "l-plastic":
+            gambe.material = ourMaterialPlastic
+            break;
+          case "l-golden":
+            gambe.material = ourMaterialGOLDEN;
+            break;
+          case "s-texture":
+            seduta.material = ourMaterial1;
+            break;
+          case "s-plastic":
+            seduta.material = ourMaterialPlastic
+            break;
+          case "s-golden":
+            seduta.material = ourMaterialGOLDEN;
+            break;
+          case "st-texture":
+            struttura.material = ourMaterial;
+            break;
+          case "st-plastic":
+            struttura.material = ourMaterialPlastic
+            break;
+          case "st-golden":
+            struttura.material = ourMaterialGOLDEN;
+            break;
+          default:
+            console.log(this);
+            break;
+        }
+        render();
+      });
+    });
   </script>
 </body>
 
