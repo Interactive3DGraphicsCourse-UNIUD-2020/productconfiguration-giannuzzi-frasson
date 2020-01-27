@@ -330,6 +330,7 @@
       pointLightPosition2: { type: "v3", value: new THREE.Vector3() },
       clight: { type: "v3", value: new THREE.Vector3() },
     };
+
     //CODICE DEGLI SHADER PRESENTE IN shader.js
     vs = vertexShader();
     fs = fragmentShader();
@@ -435,6 +436,7 @@ dirLight.shadow.bias = - 0.0001;
     targetObject.position.z = 2;
     scene.add(targetObject);
     light1.target = targetObject;
+    
     var targetObject2 = new THREE.Object3D();
     targetObject2.position.x = -3;
     targetObject2.position.y = 4;
@@ -476,28 +478,31 @@ dirLight.shadow.bias = - 0.0001;
       */
 
 
-      camera.position.set(0, 20, 40);
+      camera.position.set(-14, 6, 11);
+      //camera.lookAt(0,10,0);
       scene.add(camera);
       scene.add(sedia);
 
       //IMPOSTIAMO QUI LE INFO DELLA CANVAS
-      renderer.setPixelRatio(10);
+      renderer.setPixelRatio(8);
       //renderer.setSize(window.innerWidth, window.innerHeight);
 
       controls.addEventListener('change', render);
-      controls.minDistance = 1;
-      controls.maxDistance = 100;
+      controls.minDistance = 10;
+      controls.maxDistance = 40;
       //controls.maxPolarAngle = Math.PI / 2;
       controls.enablePan = false;
-      controls.target.copy(sedia.position);
+      controls.target.set(0,5,0);
       controls.update();
-
       window.addEventListener('resize', onResize, false);
 
 
       stats.domElement.style.position = 'absolute';
       stats.domElement.style.top = '0px';
+      stats.domElement.style.paddingLeft = '10px';
+      parent.appendChild(stats.domElement);
 
+      
 
       ourMaterial.needsUpdate = true;
 
@@ -551,6 +556,7 @@ dirLight.shadow.bias = - 0.0001;
       textureSettings1.add(textureParameters1, 'normalScale').min(-3).max(3).onChange(function (newVal) { render() });
       textureSettings1.add(textureParameters1, 'displacementScale').min(-3).max(3).onChange(function (newVal) { render() });
 
+      parent.appendChild(gui.domElement);
     }
 
 

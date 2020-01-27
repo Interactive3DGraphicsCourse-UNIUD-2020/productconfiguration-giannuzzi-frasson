@@ -18,3 +18,5 @@
 -sostituzione delle meshLight con delle SpotLight e modifica degli shader per permettere l'utilizzo di queste nuove luci
 -creazione interfaccia del sito
 -vari test su luci, ombre e environment map
+26 gennaio:
+-implementazione della scena nell'interfaccia del sito con ridimensionamentod ella canvas e limitazione dei muovimenti dell'OrbitControl
