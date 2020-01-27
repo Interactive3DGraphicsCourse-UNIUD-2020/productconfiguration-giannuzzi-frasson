@@ -57,22 +57,6 @@
                 <canvas id="canvass" width="100" height="300"></canvas>
               </div>
             </div>
-            <!--
-            <div class="col-md-6">
-
-              <div class="container service1-items col-sm-2 col-md-2 pull-right">
-                <a id="item-1" class="service1-item">
-                  <img src="textures\diesel\Material_1256.png" alt=""></img>
-                </a>
-                <a id="item-2" class="service1-item">
-                  <img src="textures\diesel\Material_1256.png" alt=""></img>
-                </a>
-                <a id="item-3" class="service1-item">
-                  <img src="textures\diesel\Marble_Tiles_001_roughness.jpg" alt=""></img>
-                  <p>And if I put a description here were it goes  </p>
-                </a>
-              </div>
-            </div>  -->
             <div class="col-md-6">
               <div class="product-title"> <b>Rock Chair</b> | Diesel with Moroso</div>
               <div class="product-desc">by Diesel Creative Team, 2010 Collection, in collaboration with Moroso.
@@ -83,6 +67,26 @@
                   class="fa fa-star gold"></i> <i class="fa fa-star gold"></i> <i class="fa fa-star-o"></i> </div>
               <hr>
               <div class="product-desc">Rock Chair is avviable in multiple colors and materials:</div>
+              <br>
+              <div class="product-desc"><b>Legs material:</b></div>
+              <form action="">
+                <input type="radio" name="legs" value="texture"> Wood
+                <input type="radio" name="legs" value="golden"> Golden
+                <input type="radio" name="legs" value="plastic"> Plastic
+              </form>
+              <div class="product-desc"><b>Seat material:</b></div>
+              <form action="">
+                <input type="radio" name="legs" value="texture"> Fabric
+                <input type="radio" name="legs" value="golden"> Golden
+                <input type="radio" name="legs" value="plastic"> Plastic
+              </form>
+              <div class="product-desc"><b>Structure material:</b></div>
+              <form action="">
+                <input type="radio" name="legs" value="texture"> Metal
+                <input type="radio" name="legs" value="golden"> Golden
+                <input type="radio" name="legs" value="plastic"> Plastic
+              </form>
+              <hr>
               <div class="product-price">$ 368.00</div>
               <div class="product-stock">In Stock</div>
               <hr>
@@ -233,6 +237,17 @@
       roughness: 0.54
     }
 
+    // default: red plastic
+    var materialParameters = {
+      cdiff_red: 0.7,
+      cdiff_green: 0.0,
+      cdiff_blue: 0.0,
+      cspec_red: 0.04,
+      cspec_green: 0.04,
+      cspec_blue: 0.04,
+      roughness: 0.3
+    }
+
     //FUNCTION PER IL CORRETTO CARICAMENTO DELLE TEXTURE
     function loadTexture(file) {
       var texture = new THREE.TextureLoader().load(file, function (texture) {
@@ -331,11 +346,22 @@
       clight: { type: "v3", value: new THREE.Vector3() },
     };
 
+    var uniformsPlastic = {
+      cspec: { type: "v3", value: new THREE.Vector3() },
+      cdiff: { type: "v3", value: new THREE.Vector3() },
+      roughness: { type: "f", value: 0.5 },
+      pointLightPosition: { type: "v3", value: new THREE.Vector3() },
+      pointLightPosition1: { type: "v3", value: new THREE.Vector3() },
+      pointLightPosition2: { type: "v3", value: new THREE.Vector3() },
+      clight: { type: "v3", value: new THREE.Vector3() },
+    };
+
     //CODICE DEGLI SHADER PRESENTE IN shader.js
     vs = vertexShader();
     fs = fragmentShader();
     fs1 = fragmentShader1();
     fsGOLDEN = fragmentShaderGOLDEN();
+    fsPlastic = fragmentShaderPlastic();
 
     //PAVIMENTO
     var geo = new THREE.PlaneGeometry(1000, 1000, 100, 100);
@@ -353,6 +379,8 @@
     ourMaterial1.extensions.derivatives = true;
     var ourMaterialGOLDEN = new THREE.ShaderMaterial({ uniforms: uniformsGOLDEN, vertexShader: vs, fragmentShader: fsGOLDEN });
     ourMaterialGOLDEN.extensions.derivatives = true;
+    var ourMaterialPlastic = new THREE.ShaderMaterial({ uniforms: uniformsPlastic, vertexShader: vs, fragmentShader: fsPlastic });
+    ourMaterial1.extensions.derivatives = true;
 
 
     //carico oggetto       
@@ -368,7 +396,7 @@
       struttura = object.children[1];
       seduta = object.children[0];
       seduta.material = ourMaterial1;
-      struttura.material = ourMaterial;
+      struttura.material = ourMaterialPlastic;
       gambe.material = ourMaterialGOLDEN;
 
       gambe.castShadow = true;
@@ -429,6 +457,10 @@ dirLight.shadow.bias = - 0.0001;
     uniformsGOLDEN.pointLightPosition1.value = light1.position;
     uniformsGOLDEN.pointLightPosition2.value = light2.position;
 
+    uniformsPlastic.pointLightPosition.value = light.position;
+    uniformsPlastic.pointLightPosition1.value = light1.position;
+    uniformsPlastic.pointLightPosition2.value = light2.position;
+
     //modifico target delle luci altrimenti punta a (0, 0, 0);
     var targetObject = new THREE.Object3D();
     targetObject.position.x = 2;
@@ -436,7 +468,7 @@ dirLight.shadow.bias = - 0.0001;
     targetObject.position.z = 2;
     scene.add(targetObject);
     light1.target = targetObject;
-    
+
     var targetObject2 = new THREE.Object3D();
     targetObject2.position.x = -3;
     targetObject2.position.y = 4;
@@ -492,7 +524,7 @@ dirLight.shadow.bias = - 0.0001;
       controls.maxDistance = 40;
       //controls.maxPolarAngle = Math.PI / 2;
       controls.enablePan = false;
-      controls.target.set(0,5,0);
+      controls.target.set(0, 5, 0);
       controls.update();
       window.addEventListener('resize', onResize, false);
 
@@ -502,7 +534,7 @@ dirLight.shadow.bias = - 0.0001;
       stats.domElement.style.paddingLeft = '10px';
       parent.appendChild(stats.domElement);
 
-      
+
 
       ourMaterial.needsUpdate = true;
 
@@ -605,7 +637,19 @@ dirLight.shadow.bias = - 0.0001;
         lightParameters.red * lightParameters.intensity,
         lightParameters.green * lightParameters.intensity,
         lightParameters.blue * lightParameters.intensity);
+
+      uniformsPlastic.cspec.value = new THREE.Vector3(materialParameters.cspec_red,
+        materialParameters.cspec_green, materialParameters.cspec_blue);
+      uniformsPlastic.cdiff.value = new THREE.Vector3(materialParameters.cdiff_red,
+        materialParameters.cdiff_green, materialParameters.cdiff_blue);
+      uniformsPlastic.roughness.value = materialParameters.roughness > 0.0 ? materialParameters.roughness : 0.01;
+      uniformsPlastic.clight.value = new THREE.Vector3(
+        lightParameters.red * lightParameters.intensity,
+        lightParameters.green * lightParameters.intensity,
+        lightParameters.blue * lightParameters.intensity);
     }
+
+
 
     init();
     buildGui();
