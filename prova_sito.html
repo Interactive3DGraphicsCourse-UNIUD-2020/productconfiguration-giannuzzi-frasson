@@ -86,6 +86,8 @@
                 <input type="radio" name="structure" value="st-golden"> Golden
                 <input type="radio" name="structure" value="st-plastic"> Plastic
               </form>
+              <div class="product-desc">You can select which color you prefer for the <b>plastic</b> (only for the
+                plastic material):</div> <input class="jscolor {onFineChange:'updateColor(this)'}" value="FF0000">
               <hr>
               <div class="product-price">$ 368.00</div>
               <div class="product-stock">In Stock</div>
@@ -168,6 +170,7 @@
   <script src="js/jquery-3.4.1.slim.min.js"></script>
   <script src="js/popper.min.js"></script>
   <script src="js/bootstrap.min.js"></script>
+  <script src="js/jscolor.js"></script>
 
   <script src="libs/three.min.js"></script>
   <script src="libs/stats.min.js"></script>
@@ -381,7 +384,7 @@
 
     var uniformsPlastic = {
       cspec: { type: "v3", value: new THREE.Vector3() },
-      cdiff: { type: "v3", value: new THREE.Vector3() },
+      cdiff: { type: "v3", value: new THREE.Vector3(1.0,0.0,0.0) },
       roughness: { type: "f", value: 0.5 },
       pointLightPosition: { type: "v3", value: new THREE.Vector3() },
       pointLightPosition1: { type: "v3", value: new THREE.Vector3() },
@@ -704,8 +707,7 @@ dirLight.shadow.bias = - 0.0001;
 
       uniformsPlastic.cspec.value = new THREE.Vector3(materialParameters.cspec_red,
         materialParameters.cspec_green, materialParameters.cspec_blue);
-      uniformsPlastic.cdiff.value = new THREE.Vector3(materialParameters.cdiff_red,
-        materialParameters.cdiff_green, materialParameters.cdiff_blue);
+
       uniformsPlastic.roughness.value = materialParameters.roughness > 0.0 ? materialParameters.roughness : 0.01;
       uniformsPlastic.clight.value = new THREE.Vector3(
         lightParameters.red * lightParameters.intensity,
@@ -719,6 +721,17 @@ dirLight.shadow.bias = - 0.0001;
     buildGui();
     update();
     render();
+
+    function updateColor(picker) {
+      /*console.log(Math.round(picker.rgb[0]) + ', ' +
+        Math.round(picker.rgb[1]) + ', ' +
+        Math.round(picker.rgb[2]));*/
+
+      ourMaterialPlastic.uniforms.cdiff.value = new THREE.Vector3((Math.round(picker.rgb[0])) / 255,
+        (Math.round(picker.rgb[1])) / 255,
+        (Math.round(picker.rgb[2])) / 255);
+      render();
+    }
 
     $(document).ready(function () {
       $('input[type=radio]').click(function () {

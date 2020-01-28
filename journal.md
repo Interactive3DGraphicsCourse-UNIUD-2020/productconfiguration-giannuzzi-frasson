@@ -20,3 +20,7 @@
 -vari test su luci, ombre e environment map
 26 gennaio:
 -implementazione della scena nell'interfaccia del sito con ridimensionamentod ella canvas e limitazione dei muovimenti dell'OrbitControl
+27 gennaio:
+-implementazione radiobutton per la selezione e il cambio del materiali nella pagina HTML
+28 gennaio:
+-implementazione del coloropicker jcolor.js legato al materialPlastic
