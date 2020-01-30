@@ -155,6 +155,12 @@
   <script src='libs/dat.gui.min.js'></script>
   <script src='libs/shaders.js'></script>
 
+  <script src="libs/EffectComposer.js"></script>  
+	<script src="libs/ShaderPass.js"></script>
+  <script src="libs/RenderPass.js"></script>
+  <script src="libs/BokehPass.js"></script>
+  <script src="libs/BokehShader.js"></script>
+
   <!-- three.js code -->
 
   <script>
@@ -172,6 +178,21 @@
 				toneMapping: THREE.Uncharted2ToneMapping,
 				renderMode: "Renderer"
 		};  
+
+    //valori composer
+    var postprocessing = {};
+
+    var effectController = {
+      focus: 500.0,
+      aperture:	5,
+      maxblur:	1.0
+    };
+
+    var matChanger = function ( ) {
+      postprocessing.bokeh.uniforms[ "focus" ].value = effectController.focus;
+      postprocessing.bokeh.uniforms[ "aperture" ].value = effectController.aperture * 0.00001;
+      postprocessing.bokeh.uniforms[ "maxblur" ].value = effectController.maxblur;
+    };
 
 
     //LIGHTS FOR SHADER
@@ -491,6 +512,21 @@
     scene.add(targetObject2);
     light2.target = targetObject2;
 
+    renderPass = new THREE.RenderPass( scene, camera );
+    bokehPass = new THREE.BokehPass( scene, camera, {
+					focus: 1.0,
+					aperture:	0.025,
+					maxblur:	1.0,
+					width: parent.clientWidth,
+					height: parent.clientHeight
+        } );
+    composer = new THREE.EffectComposer( renderer );
+    composer.addPass( renderPass );
+		composer.addPass( bokehPass );
+    postprocessing.composer = composer;
+		postprocessing.bokeh = bokehPass;
+
+
 
     var gui;
     var stats = new Stats();
@@ -532,6 +568,7 @@
 
       //IMPOSTIAMO QUI LE INFO DELLA CANVAS
       renderer.setPixelRatio(8);
+      composer.setPixelRatio(8);
       //renderer.setSize(window.innerWidth, window.innerHeight);
 
       controls.addEventListener('change', render);
@@ -553,6 +590,7 @@
     function onResize() {
 
       renderer.setSize(parent.clientWidth, parent.clientHeight);
+      postprocessing.composer.setSize( width, height );
       camera.aspect = (parent.clientWidth / parent.clientHeight);
       camera.updateProjectionMatrix();
       render();
@@ -561,6 +599,7 @@
     function update() {
       requestAnimationFrame(update);
       stats.update();
+      render();
     }
 
     function render() {
@@ -581,7 +620,12 @@
       ourMaterialPlastic.needsUpdate = true;      
       renderer.toneMappingExposure = toneParameters.exposure;
 
-      renderer.render(scene, camera);
+      if ( toneParameters.renderMode === "Composer" ) {        
+        //composer.render();
+        postprocessing.composer.render( 0.1 );
+      } else {
+        renderer.render( scene, camera );
+      } 
 
     }
 
@@ -619,6 +663,13 @@
       textureSettingsWood.add(textureParametersWood, 'repeatT').min(0.1).max(10).onChange(function (newVal) { render() });
       textureSettingsWood.add(textureParametersWood, 'normalScale').min(-3).max(3).onChange(function (newVal) { render() });
       textureSettingsWood.add(textureParametersWood, 'displacementScale').min(-3).max(3).onChange(function (newVal) { render() });
+
+      gui.add( effectController, "focus", 10.0, 3000.0, 10 ).onChange( matChanger );
+			gui.add( effectController, "aperture", 0, 10, 0.1 ).onChange( matChanger );
+      gui.add( effectController, "maxblur", 0.0, 3.0, 0.025 ).onChange( matChanger );
+      matChanger();
+
+      gui.add( toneParameters, 'renderMode', [ 'Renderer', 'Composer' ] );
 
       //parent.appendChild(gui.domElement);
     }
