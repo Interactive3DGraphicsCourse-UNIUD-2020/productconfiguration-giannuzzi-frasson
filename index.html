@@ -110,61 +110,37 @@
       </div>
       <div class="container-fluid">
         <div class="col-md-12 product-info">
-          <ul id="myTab" class="nav nav-tabs nav_tabs">
+          <div class="container product-info">
+            <h3>DESCRIPTION</h3>
+            The Rock Chair has an iconic design made by Moroso in collaboration with the Diesel Creative team for the
+            2010 collection. The aspect is unique, the semplicity and mix between curves and hard edges makes the light
+            bounching in many different ways.
+            Moroso made this possible and A.C.M.E. went even further prototyping and developing the same design in many
+            different materials. In the begenning made a new release made all in colored plastic, a shiny PVC that
+            permit to the customer to custom theyr purchese.
 
-            <li class="active"><a href="#service-one" data-toggle="tab">DESCRIPTION</a></li>
-            <li><a href="#service-two" data-toggle="tab">PRODUCT INFO</a></li>
-            <li><a href="#service-three" data-toggle="tab">REVIEWS</a></li>
-
-          </ul>
-          <div id="myTabContent" class="tab-content">
-            <div class="tab-pane fade in active" id="service-one">
-
-              <section class="container product-info">
-                The Corsair Gaming Series GS600 power supply is the ideal price-performance solution for building or
-                upgrading a Gaming PC. A single +12V rail provides up to 48A of reliable, continuous power for
-                multi-core gaming PCs with multiple graphics cards. The ultra-quiet, dual ball-bearing fan automatically
-                adjusts its speed according to temperature, so it will never intrude on your music and games. Blue LEDs
-                bathe the transparent fan blades in a cool glow. Not feeling blue? You can turn off the lighting with
-                the press of a button.
-
-                <h3>Corsair Gaming Series GS600 Features:</h3>
-                <li>It supports the latest ATX12V v2.3 standard and is backward compatible with ATX12V 2.2 and ATX12V
-                  2.01 systems</li>
-                <li>An ultra-quiet 140mm double ball-bearing fan delivers great airflow at an very low noise level by
-                  varying fan speed in response to temperature</li>
-                <li>80Plus certified to deliver 80% efficiency or higher at normal load conditions (20% to 100% load)
-                </li>
-                <li>0.99 Active Power Factor Correction provides clean and reliable power</li>
-                <li>Universal AC input from 90~264V — no more hassle of flipping that tiny red switch to select the
-                  voltage input!</li>
-                <li>Extra long fully-sleeved cables support full tower chassis</li>
-                <li>A three year warranty and lifetime access to Corsair’s legendary technical support and customer
-                  service</li>
-                <li>Over Current/Voltage/Power Protection, Under Voltage Protection and Short Circuit Protection provide
-                  complete component safety</li>
-                <li>Dimensions: 150mm(W) x 86mm(H) x 160mm(L)</li>
-                <li>MTBF: 100,000 hours</li>
-                <li>Safety Approvals: UL, CUL, CE, CB, FCC Class B, TÜV, CCC, C-tick</li>
-              </section>
-
-            </div>
-            <div class="tab-pane fade" id="service-two">
-
-              <section class="container">
-
-              </section>
-
-            </div>
-            <div class="tab-pane fade" id="service-three">
-
-            </div>
+            <h3>A.C.M.E. Rocket Chair by Moroso features:</h3>
+            <li>5 materials avviable for their parts (not all materials are avviable for each parts):<ul>
+                <li>Painted metal</li>
+                <li>Sintetic Whool</li>
+                <li>Golden</li>
+                <li>Plastic</li>
+                <li>Wood</li>
+              </ul>
+            </li>
+            <li>Stuffed and ultra soft Pillow for the seat</li>
+            <li>Ultralight version if take all in PVC
+            </li>
+            <li>Luxory edition gold plated</li>
           </div>
+
+
           <hr>
         </div>
       </div>
     </div>
   </div>
+
   <!-- Optional JavaScript -->
   <!-- jQuery first, then Popper.js, then Bootstrap JS -->
   <script src="js/jquery-3.4.1.slim.min.js"></script>
@@ -207,23 +183,23 @@
     }
 
     //TEXTURE FOR SHADERS
-    var textureParameters = {
-      material: "Marble_Tiles_001",
+    var textureParametersPaint = {
+      material: "Metal_Painted_001",
       repeatS: 1.0,
       repeatT: 1.0,
       normalScale: 1.0,
       displacementScale: 0.0,
     }
 
-    var textureParameters1 = {
+    var textureParametersFabric = {
       material: "Fabric_Padded_004_",
-      repeatS: 0.2,
-      repeatT: 0.2,
-      normalScale: 3.0,
-      displacementScale: 0.3,
+      repeatS: 0.4,
+      repeatT: 0.4,
+      normalScale: 0.0,
+      displacementScale: 0.0,
     }
 
-    var textureParameters2 = {
+    var textureParametersWood = {
       material: "Wood_007_",
       repeatS: 0.3,
       repeatT: 1.5,
@@ -241,7 +217,7 @@
     }
 
     // default: red plastic
-    var materialParameters = {
+    var materialParametersPlastic= {
       cdiff_red: 0.7,
       cdiff_green: 0.0,
       cdiff_blue: 0.0,
@@ -259,33 +235,35 @@
         texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
         texture.offset.set(0, 0);
         texture.needsUpdate = true;
+        console.log("PRIMA: " + texture.rotation);
+        texture.rotation = (1.55);
+        console.log("DOPO: " + texture.rotation);
         render();
       })
       return texture;
     }
 
     //MAPPE PER LA TEXTURE
-    var diffuseMap = loadTexture("textures/diesel/Metal_Painted_001_basecolor.jpg");
-    var specularMap = loadTexture("textures/diesel/Metal_Painted_001_roughness.jpg");
-    var roughnessMap = loadTexture("textures/diesel/Metal_Painted_001_roughness.jpg");
-    var normalMap = loadTexture("textures/diesel/Metal_Painted_001_normal.jpg");
-    var aoMap = loadTexture("textures/diesel/Metal_Painted_001_ambientOcclusion.jpg");
-    var displacementMap = loadTexture("textures/diesel/Metal_Painted_001_height.png");
+    var diffuseMapPaint = loadTexture("textures/diesel/Metal_Painted_001_basecolor.jpg");
+    var specularMapPaint = loadTexture("textures/diesel/Metal_Painted_001_roughness.jpg");
+    var roughnessMapPaint = loadTexture("textures/diesel/Metal_Painted_001_roughness.jpg");
+    var normalMapPaint = loadTexture("textures/diesel/Metal_Painted_001_normal.jpg");
+    var aoMapPaint = loadTexture("textures/diesel/Metal_Painted_001_ambientOcclusion.jpg");
+    var displacementMapPaint = loadTexture("textures/diesel/Metal_Painted_001_height.png");
 
-    var diffuseMap1 = loadTexture("textures/diesel/Fabric_Padded_004_basecolor.jpg");
-    var specularMap1 = loadTexture("textures/diesel/Fabric_Padded_004_roughness.jpg");
-    var roughnessMap1 = loadTexture("textures/diesel/Fabric_Padded_004_roughness.jpg");
-    var normalMap1 = loadTexture("textures/diesel/Fabric_Padded_004_normal.jpg");
-    var aoMap1 = loadTexture("textures/diesel/Fabric_Padded_004_ambientOcclusion.jpg");
-    var displacementMap1 = loadTexture("textures/diesel/Fabric_Padded_004_height.png");
+    var diffuseMapFabric = loadTexture("textures/diesel/Fabric_Burlap_003_basecolor.jpg");
+    var specularMapFabric = loadTexture("textures/diesel/Fabric_Burlap_003_roughness.jpg");
+    var roughnessMapFabric = loadTexture("textures/diesel/Fabric_Burlap_003_roughness.jpg");
+    var normalMapFabric = loadTexture("textures/diesel/Fabric_Burlap_003_normal.jpg");
+    var aoMapFabric = loadTexture("textures/diesel/Fabric_Burlap_003_ambientOcclusion.jpg");
+    var displacementMapFabric = loadTexture("textures/diesel/Fabric_Burlap_003_height.png");
 
-    var diffuseMap2 = loadTexture("textures/diesel/Old_Wood_001_COLOR.jpg");
-    var specularMap2 = loadTexture("textures/diesel/Old_Wood_001_ROUGH.jpg");
-    var roughnessMap2 = loadTexture("textures/diesel/Old_Wood_001_ROUGH.jpg");
-    var normalMap2 = loadTexture("textures/diesel/Old_Wood_001_NORM.jpg");
-    var aoMap2 = loadTexture("textures/diesel/Old_Wood_001_OCC.jpg");
-    var displacementMap2 = loadTexture("textures/diesel/Old_Wood_001_DISP.png");
-
+    var diffuseMapWood = loadTexture("textures/diesel/Old_Wood_001_COLOR.jpg");
+    var specularMapWood = loadTexture("textures/diesel/Old_Wood_001_ROUGH.jpg");
+    var roughnessMapWood = loadTexture("textures/diesel/Old_Wood_001_ROUGH.jpg");
+    var normalMapWood = loadTexture("textures/diesel/Old_Wood_001_NORM.jpg");
+    var aoMapWood = loadTexture("textures/diesel/Old_Wood_001_OCC.jpg");
+    var displacementMapWood = loadTexture("textures/diesel/Old_Wood_001_DISP.png");
 
     //CUBEMAP
     var loader = new THREE.CubeTextureLoader();
@@ -295,22 +273,28 @@
       'py.png', 'ny.png',
       'pz.png', 'nz.png'
     ]);
-    scene.background = textureCube;
+    
+    //CUBO
+    var geometry = new THREE.BoxGeometry( 100, 100, 100 );
+    var material = new THREE.MeshPhongMaterial( {color: 0xffffff, side: THREE.BackSide} );
+    var cube = new THREE.Mesh( geometry, material );
+    scene.add( cube );
+
 
     //SHADER UNIFORMS
-    var uniforms = {
+    var uniformsPaint = {
       uniforms: THREE.UniformsUtils.merge([
         THREE.UniformsLib['lights'],
         {
           lightIntensity: { type: 'f', value: 1.0 },
         }
       ]),
-      specularMap: { type: "t", value: specularMap1 },
-      diffuseMap: { type: "t", value: diffuseMap },
-      roughnessMap: { type: "t", value: roughnessMap },
-      normalMap: { type: "t", value: normalMap },
-      aoMap: { type: "t", value: aoMap },
-      displacementMap: { type: "t", value: displacementMap },
+      specularMap: { type: "t", value: specularMapPaint },
+      diffuseMap: { type: "t", value: diffuseMapPaint },
+      roughnessMap: { type: "t", value: roughnessMapPaint },
+      normalMap: { type: "t", value: normalMapPaint },
+      aoMap: { type: "t", value: aoMapPaint },
+      displacementMap: { type: "t", value: displacementMapPaint },
       displacementScale: { type: "f", value: 0.0 },
       normalScale: { type: "v2", value: new THREE.Vector2(1, 1) },
       spotLightPosition: { type: "v3", value: new THREE.Vector3() },
@@ -323,19 +307,20 @@
       lights: true,
     };
 
-    var uniforms1 = {
+
+    var uniformsFabric = {
       uniforms: THREE.UniformsUtils.merge([
         THREE.UniformsLib['lights'],
         {
           lightIntensity: { type: 'f', value: 1.0 },
         }
       ]),
-      specularMap: { type: "t", value: specularMap1 },
-      diffuseMap: { type: "t", value: diffuseMap1 },
-      roughnessMap: { type: "t", value: roughnessMap1 },
-      normalMap: { type: "t", value: normalMap1 },
-      aoMap: { type: "t", value: aoMap1 },
-      displacementMap: { type: "t", value: displacementMap1 },
+      specularMap: { type: "t", value: specularMapFabric },
+      diffuseMap: { type: "t", value: diffuseMapFabric },
+      roughnessMap: { type: "t", value: roughnessMapFabric },
+      normalMap: { type: "t", value: normalMapFabric },
+      aoMap: { type: "t", value: aoMapFabric },
+      displacementMap: { type: "t", value: displacementMapFabric },
       displacementScale: { type: "f", value: 0.0 },
       normalScale: { type: "v2", value: new THREE.Vector2(2, 2) },
       spotLightPosition: { type: "v3", value: new THREE.Vector3() },
@@ -348,19 +333,19 @@
       lights: true,
     };
 
-    var uniforms2 = {
+    var uniformsWood = {
       uniforms: THREE.UniformsUtils.merge([
         THREE.UniformsLib['lights'],
         {
           lightIntensity: { type: 'f', value: 1.0 },
         }
       ]),
-      specularMap: { type: "t", value: specularMap2 },
-      diffuseMap: { type: "t", value: diffuseMap2 },
-      roughnessMap: { type: "t", value: roughnessMap2 },
-      normalMap: { type: "t", value: normalMap2 },
-      aoMap: { type: "t", value: aoMap1 },
-      displacementMap: { type: "t", value: displacementMap2 },
+      specularMap: { type: "t", value: specularMapWood },
+      diffuseMap: { type: "t", value: diffuseMapWood },
+      roughnessMap: { type: "t", value: roughnessMapWood },
+      normalMap: { type: "t", value: normalMapWood },
+      aoMap: { type: "t", value: aoMapWood},
+      displacementMap: { type: "t", value: displacementMapWood },
       displacementScale: { type: "f", value: 0.0 },
       normalScale: { type: "v2", value: new THREE.Vector2(1, 1) },
       pointLightPosition: { type: "v3", value: new THREE.Vector3() },
@@ -384,7 +369,7 @@
 
     var uniformsPlastic = {
       cspec: { type: "v3", value: new THREE.Vector3() },
-      cdiff: { type: "v3", value: new THREE.Vector3(1.0,0.0,0.0) },
+      cdiff: { type: "v3", value: new THREE.Vector3(1.0, 0.0, 0.0) },
       roughness: { type: "f", value: 0.5 },
       pointLightPosition: { type: "v3", value: new THREE.Vector3() },
       pointLightPosition1: { type: "v3", value: new THREE.Vector3() },
@@ -409,12 +394,13 @@
     plane.receiveShadow = true;
 
     //DEFINIZIONE MATERIALE
-    var ourMaterial = new THREE.ShaderMaterial({ uniforms: uniforms, vertexShader: vs, fragmentShader: fs });
-    ourMaterial.extensions.derivatives = true;
-    var ourMaterial1 = new THREE.ShaderMaterial({ uniforms: uniforms1, vertexShader: vs, fragmentShader: fs1 });
-    ourMaterial1.extensions.derivatives = true;
-    var ourMaterial2 = new THREE.ShaderMaterial({ uniforms: uniforms2, vertexShader: vs, fragmentShader: fs1 });
-    ourMaterial2.extensions.derivatives = true;
+    var ourMaterialPaint = new THREE.ShaderMaterial({ uniforms: uniformsPaint, vertexShader: vs, fragmentShader: fs });
+    ourMaterialPaint.extensions.derivatives = true;
+
+    var ourMaterialFabric = new THREE.ShaderMaterial({ uniforms: uniformsFabric, vertexShader: vs, fragmentShader: fs1 });
+    ourMaterialFabric.extensions.derivatives = true;
+    var ourMaterialWood = new THREE.ShaderMaterial({ uniforms: uniformsWood, vertexShader: vs, fragmentShader: fs1 });
+    ourMaterialWood.extensions.derivatives = true;
     var ourMaterialGOLDEN = new THREE.ShaderMaterial({ uniforms: uniformsGOLDEN, vertexShader: vs, fragmentShader: fsGOLDEN });
     ourMaterialGOLDEN.extensions.derivatives = true;
     var ourMaterialPlastic = new THREE.ShaderMaterial({ uniforms: uniformsPlastic, vertexShader: vs, fragmentShader: fsPlastic });
@@ -431,9 +417,9 @@
       gambe = object.children[2];
       struttura = object.children[1];
       seduta = object.children[0];
-      seduta.material = ourMaterial1;
-      struttura.material = ourMaterial;
-      gambe.material = ourMaterial2;
+      seduta.material = ourMaterialFabric;
+      struttura.material = ourMaterialPaint;
+      gambe.material = ourMaterialWood;
 
       gambe.castShadow = true;
       struttura.castShadow = true;
@@ -448,26 +434,6 @@
       render();
     });
 
-    /*
-    //LUCI        
-hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.2 );
-hemiLight.color.setHSL( 0.6, 1, 0.6 );
-hemiLight.groundColor.setHSL( 0.095, 1, 0.75 );
-hemiLight.position.set( 0, 50, 0 );
-    scene.add( hemiLight );
-    
-    dirLight = new THREE.DirectionalLight( 0xffffff, 1 );
-dirLight.color.setHSL( 0.1, 1, 0.95 );
-dirLight.position.set( - 1, 1.75, 1 );
-dirLight.position.multiplyScalar( 30 );
-scene.add( dirLight );
-dirLight.castShadow = true;
-dirLight.shadow.mapSize.width = 1024;
-dirLight.shadow.mapSize.height = 1024;
-dirLight.shadow.camera.far = 3500;
-dirLight.shadow.bias = - 0.0001;
-    */
-
     var light = new THREE.SpotLight(0xffffff, 0.8, 100, Math.PI / 2, 0.2, 2);//SpotLight( color : Integer, intensity : Float, distance : Float, angle : Radians, penumbra : Float, decay : Float )
     light.position.set(0.0, 25.0, -10.0);
     scene.add(light);
@@ -480,18 +446,18 @@ dirLight.shadow.bias = - 0.0001;
     var light2 = new THREE.SpotLight(0x0f4c81, 0.8, 100, Math.PI / 3, 0.9, 6);
     light2.position.set(-28.0, 15.0, 3.0);
     scene.add(light2);
+    
+    uniformsPaint.spotLightPosition.value = light.position;
+    uniformsPaint.spotLightPosition1.value = light1.position;
+    uniformsPaint.spotLightPosition2.value = light2.position;
 
-    uniforms.spotLightPosition.value = light.position;
-    uniforms.spotLightPosition1.value = light1.position;
-    uniforms.spotLightPosition2.value = light2.position;
+    uniformsFabric.spotLightPosition.value = light.position;
+    uniformsFabric.spotLightPosition1.value = light1.position;
+    uniformsFabric.spotLightPosition2.value = light2.position;
 
-    uniforms1.spotLightPosition.value = light.position;
-    uniforms1.spotLightPosition1.value = light1.position;
-    uniforms1.spotLightPosition2.value = light2.position;
-
-    uniforms2.pointLightPosition.value = light.position;
-    uniforms2.pointLightPosition1.value = light1.position;
-    uniforms2.pointLightPosition2.value = light2.position;
+    uniformsWood.pointLightPosition.value = light.position;
+    uniformsWood.pointLightPosition1.value = light1.position;
+    uniformsWood.pointLightPosition2.value = light2.position;
 
     uniformsGOLDEN.pointLightPosition.value = light.position;
     uniformsGOLDEN.pointLightPosition1.value = light1.position;
@@ -562,9 +528,9 @@ dirLight.shadow.bias = - 0.0001;
       controls.addEventListener('change', render);
       controls.minDistance = 10;
       controls.maxDistance = 40;
-      //controls.maxPolarAngle = Math.PI / 2;
       controls.enablePan = false;
       controls.target.set(0, 5, 0);
+      controls.maxPolarAngle = 1.67;
       controls.update();
       window.addEventListener('resize', onResize, false);
 
@@ -573,11 +539,6 @@ dirLight.shadow.bias = - 0.0001;
       stats.domElement.style.top = '0px';
       stats.domElement.style.paddingLeft = '10px';
       parent.appendChild(stats.domElement);
-
-
-
-      ourMaterial.needsUpdate = true;
-
     }
 
     function onResize() {
@@ -616,86 +577,86 @@ dirLight.shadow.bias = - 0.0001;
       lightSettings.add(lightParameters, 'blue').min(0).max(1).onChange(function (newVal) { render() });
       lightSettings.add(lightParameters, 'intensity').min(0).max(3).onChange(function (newVal) { render() });
 
-      textureSettings = gui.addFolder('Texture parameters');
-      textureSettings.add(textureParameters, 'repeatS').min(0.1).max(10).onChange(function (newVal) { render() });
-      textureSettings.add(textureParameters, 'repeatT').min(0.1).max(10).onChange(function (newVal) { render() });
-      textureSettings.add(textureParameters, 'normalScale').min(-3).max(3).onChange(function (newVal) { render() });
-      textureSettings.add(textureParameters, 'displacementScale').min(-3).max(3).onChange(function (newVal) { render() });
+      textureSettings = gui.addFolder('Texture parameters Paint');
+      textureSettings.add(textureParametersPaint, 'repeatS').min(0.1).max(10).onChange(function (newVal) { render() });
+      textureSettings.add(textureParametersPaint, 'repeatT').min(0.1).max(10).onChange(function (newVal) { render() });
+      textureSettings.add(textureParametersPaint, 'normalScale').min(-3).max(3).onChange(function (newVal) { render() });
+      textureSettings.add(textureParametersPaint, 'displacementScale').min(-3).max(3).onChange(function (newVal) { render() });
 
-      textureSettings1 = gui.addFolder('Texture parameters1');
-      textureSettings1.add(textureParameters1, 'repeatS').min(0.1).max(10).onChange(function (newVal) { render() });
-      textureSettings1.add(textureParameters1, 'repeatT').min(0.1).max(10).onChange(function (newVal) { render() });
-      textureSettings1.add(textureParameters1, 'normalScale').min(-3).max(3).onChange(function (newVal) { render() });
-      textureSettings1.add(textureParameters1, 'displacementScale').min(-3).max(3).onChange(function (newVal) { render() });
+      textureSettingsFabric = gui.addFolder('Texture parameters Fabric');
+      textureSettingsFabric.add(textureParametersFabric, 'repeatS').min(0.1).max(10).onChange(function (newVal) { render() });
+      textureSettingsFabric.add(textureParametersFabric, 'repeatT').min(0.1).max(10).onChange(function (newVal) { render() });
+      textureSettingsFabric.add(textureParametersFabric, 'normalScale').min(-3).max(3).onChange(function (newVal) { render() });
+      textureSettingsFabric.add(textureParametersFabric, 'displacementScale').min(-3).max(3).onChange(function (newVal) { render() });
 
-      textureSettings2 = gui.addFolder('Texture parameters2');
-      textureSettings2.add(textureParameters2, 'repeatS').min(0.1).max(10).onChange(function (newVal) { render() });
-      textureSettings2.add(textureParameters2, 'repeatT').min(0.1).max(10).onChange(function (newVal) { render() });
-      textureSettings2.add(textureParameters2, 'normalScale').min(-3).max(3).onChange(function (newVal) { render() });
-      textureSettings2.add(textureParameters2, 'displacementScale').min(-3).max(3).onChange(function (newVal) { render() });
+      textureSettingsWood = gui.addFolder('Texture parameters Wood');
+      textureSettingsWood.add(textureParametersWood, 'repeatS').min(0.1).max(10).onChange(function (newVal) { render() });
+      textureSettingsWood.add(textureParametersWood, 'repeatT').min(0.1).max(10).onChange(function (newVal) { render() });
+      textureSettingsWood.add(textureParametersWood, 'normalScale').min(-3).max(3).onChange(function (newVal) { render() });
+      textureSettingsWood.add(textureParametersWood, 'displacementScale').min(-3).max(3).onChange(function (newVal) { render() });
 
-      parent.appendChild(gui.domElement);
+      //parent.appendChild(gui.domElement);
     }
 
 
     function updateUniforms() {
-      uniforms.clight.value = new THREE.Vector3(
+      uniformsPaint.clight.value = new THREE.Vector3(
         lightParameters.red * lightParameters.intensity,
         lightParameters.green * lightParameters.intensity,
         lightParameters.blue * lightParameters.intensity);
-      uniforms.ambientLight.value = new THREE.Vector3(
+      uniformsPaint.ambientLight.value = new THREE.Vector3(
         ambientLightParameters.red * ambientLightParameters.intensity,
         ambientLightParameters.green * ambientLightParameters.intensity,
         ambientLightParameters.blue * ambientLightParameters.intensity
       );
-      uniforms.textureRepeat.value = new THREE.Vector2(textureParameters.repeatS, textureParameters.repeatT);
-      uniforms.diffuseMap.value = diffuseMap;
-      uniforms.specularMap.value = specularMap;
-      uniforms.roughnessMap.value = roughnessMap;
-      uniforms.normalMap.value = normalMap;
-      uniforms.aoMap.value = aoMap;
-      uniforms.displacementMap.value = displacementMap;
-      uniforms.displacementScale.value = textureParameters.displacementScale;
-      uniforms.normalScale.value = new THREE.Vector2(textureParameters.normalScale, textureParameters.normalScale);
+      uniformsPaint.textureRepeat.value = new THREE.Vector2(textureParametersPaint.repeatS, textureParametersPaint.repeatT);
+      uniformsPaint.diffuseMap.value = diffuseMapPaint;
+      uniformsPaint.specularMap.value = specularMapPaint;
+      uniformsPaint.roughnessMap.value = roughnessMapPaint;
+      uniformsPaint.normalMap.value = normalMapPaint;
+      uniformsPaint.aoMap.value = aoMapPaint;
+      uniformsPaint.displacementMap.value = displacementMapPaint;
+      uniformsPaint.displacementScale.value = textureParametersPaint.displacementScale;
+      uniformsPaint.normalScale.value = new THREE.Vector2(textureParametersPaint.normalScale, textureParametersPaint.normalScale);
 
-      uniforms1.clight.value = new THREE.Vector3(
+      uniformsFabric.clight.value = new THREE.Vector3(
         lightParameters.red * lightParameters.intensity,
         lightParameters.green * lightParameters.intensity,
         lightParameters.blue * lightParameters.intensity);
-      uniforms1.ambientLight.value = new THREE.Vector3(
+      uniformsFabric.ambientLight.value = new THREE.Vector3(
         ambientLightParameters.red * ambientLightParameters.intensity,
         ambientLightParameters.green * ambientLightParameters.intensity,
         ambientLightParameters.blue * ambientLightParameters.intensity
       );
-      uniforms1.textureRepeat.value = new THREE.Vector2(textureParameters1.repeatS, textureParameters1.repeatT);
-      uniforms1.diffuseMap.value = diffuseMap1;
-      uniforms1.specularMap.value = specularMap1;
-      uniforms1.roughnessMap.value = roughnessMap1;
-      uniforms1.normalMap.value = normalMap1;
-      uniforms1.aoMap.value = aoMap1;
-      uniforms1.displacementMap.value = displacementMap1;
-      uniforms1.displacementScale.value = textureParameters1.displacementScale;
-      uniforms1.normalScale.value = new THREE.Vector2(textureParameters1.normalScale, textureParameters1.normalScale);
+      uniformsFabric.textureRepeat.value = new THREE.Vector2(textureParametersFabric.repeatS, textureParametersFabric.repeatT);
+      uniformsFabric.diffuseMap.value = diffuseMapFabric;
+      uniformsFabric.specularMap.value = specularMapFabric;
+      uniformsFabric.roughnessMap.value = roughnessMapFabric;
+      uniformsFabric.normalMap.value = normalMapFabric;
+      uniformsFabric.aoMap.value = aoMapFabric;
+      uniformsFabric.displacementMap.value = displacementMapFabric;
+      uniformsFabric.displacementScale.value = textureParametersFabric.displacementScale;
+      uniformsFabric.normalScale.value = new THREE.Vector2(textureParametersFabric.normalScale, textureParametersFabric.normalScale);
 
-      uniforms2.clight.value = new THREE.Vector3(
+      uniformsWood.clight.value = new THREE.Vector3(
         lightParameters.red * lightParameters.intensity,
         lightParameters.green * lightParameters.intensity,
         lightParameters.blue * lightParameters.intensity);
-      uniforms2.ambientLight.value = new THREE.Vector3(
+      uniformsWood.ambientLight.value = new THREE.Vector3(
         ambientLightParameters.red * ambientLightParameters.intensity,
         ambientLightParameters.green * ambientLightParameters.intensity,
         ambientLightParameters.blue * ambientLightParameters.intensity
       );
-      uniforms2.textureRepeat.value = new THREE.Vector2(textureParameters2.repeatS, textureParameters2.repeatT);
-      uniforms2.textureRepeat.value = new THREE.Vector2(textureParameters2.repeatS, textureParameters2.repeatT);
-      uniforms2.diffuseMap.value = diffuseMap2;
-      uniforms2.specularMap.value = specularMap2;
-      uniforms2.roughnessMap.value = roughnessMap2;
-      uniforms2.normalMap.value = normalMap2;
-      uniforms2.aoMap.value = aoMap2;
-      uniforms2.displacementMap.value = displacementMap2;
-      uniforms2.displacementScale.value = textureParameters2.displacementScale;
-      uniforms2.normalScale.value = new THREE.Vector2(textureParameters2.normalScale, textureParameters2.normalScale);
+      uniformsWood.textureRepeat.value = new THREE.Vector2(textureParametersWood.repeatS, textureParametersWood.repeatT);
+      uniformsWood.textureRepeat.value = new THREE.Vector2(textureParametersWood.repeatS, textureParametersWood.repeatT);
+      uniformsWood.diffuseMap.value = diffuseMapWood;
+      uniformsWood.specularMap.value = specularMapWood;
+      uniformsWood.roughnessMap.value = roughnessMapWood;
+      uniformsWood.normalMap.value = normalMapWood;
+      uniformsWood.aoMap.value = aoMapWood;
+      uniformsWood.displacementMap.value = displacementMapWood;
+      uniformsWood.displacementScale.value = textureParametersWood.displacementScale;
+      uniformsWood.normalScale.value = new THREE.Vector2(textureParametersWood.normalScale, textureParametersWood.normalScale);
 
 
       uniformsGOLDEN.cspec.value = new THREE.Vector3(cspecGOLDEN.red, cspecGOLDEN.green, cspecGOLDEN.blue);
@@ -705,10 +666,10 @@ dirLight.shadow.bias = - 0.0001;
         lightParameters.green * lightParameters.intensity,
         lightParameters.blue * lightParameters.intensity);
 
-      uniformsPlastic.cspec.value = new THREE.Vector3(materialParameters.cspec_red,
-        materialParameters.cspec_green, materialParameters.cspec_blue);
+      uniformsPlastic.cspec.value = new THREE.Vector3(materialParametersPlastic.cspec_red,
+        materialParametersPlastic.cspec_green, materialParametersPlastic.cspec_blue);
 
-      uniformsPlastic.roughness.value = materialParameters.roughness > 0.0 ? materialParameters.roughness : 0.01;
+      uniformsPlastic.roughness.value = materialParametersPlastic.roughness > 0.0 ? materialParametersPlastic.roughness : 0.01;
       uniformsPlastic.clight.value = new THREE.Vector3(
         lightParameters.red * lightParameters.intensity,
         lightParameters.green * lightParameters.intensity,
@@ -737,7 +698,7 @@ dirLight.shadow.bias = - 0.0001;
       $('input[type=radio]').click(function () {
         switch (this.value) {
           case "l-texture":
-            gambe.material = ourMaterial2;
+            gambe.material = ourMaterialWood;
             break;
           case "l-plastic":
             gambe.material = ourMaterialPlastic
@@ -746,7 +707,7 @@ dirLight.shadow.bias = - 0.0001;
             gambe.material = ourMaterialGOLDEN;
             break;
           case "s-texture":
-            seduta.material = ourMaterial1;
+            seduta.material = ourMaterialFabric;
             break;
           case "s-plastic":
             seduta.material = ourMaterialPlastic
@@ -755,7 +716,7 @@ dirLight.shadow.bias = - 0.0001;
             seduta.material = ourMaterialGOLDEN;
             break;
           case "st-texture":
-            struttura.material = ourMaterial;
+            struttura.material = ourMaterialPaint;
             break;
           case "st-plastic":
             struttura.material = ourMaterialPlastic
