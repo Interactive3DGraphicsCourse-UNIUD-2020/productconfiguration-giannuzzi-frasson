@@ -74,20 +74,24 @@
                 <input type="radio" name="legs" value="l-golden"> Golden
                 <input type="radio" name="legs" value="l-plastic"> Plastic
               </form>
+              <div class="product-desc">You can select which color you prefer for the <b>plastic</b> </div> <input
+                class="jscolor {onFineChange:'updateColor1(this)'}" value="FF0000">
               <div class="product-desc"><b>Seat material:</b></div>
               <form action="">
                 <input type="radio" name="seat" value="s-texture" checked="checked"> Pillow
                 <input type="radio" name="seat" value="s-golden"> Golden
                 <input type="radio" name="seat" value="s-plastic"> Plastic
               </form>
+              <div class="product-desc">You can select which color you prefer for the <b>plastic</b> </div> <input
+                class="jscolor {onFineChange:'updateColor2(this)'}" value="000000">
               <div class="product-desc"><b>Structure material:</b></div>
               <form action="">
                 <input type="radio" name="structure" value="st-texture" checked="checked"> Metal
                 <input type="radio" name="structure" value="st-golden"> Golden
                 <input type="radio" name="structure" value="st-plastic"> Plastic
               </form>
-              <div class="product-desc">You can select which color you prefer for the <b>plastic</b> (only for the
-                plastic material):</div> <input class="jscolor {onFineChange:'updateColor(this)'}" value="FF0000">
+              <div class="product-desc">You can select which color you prefer for the <b>plastic</b> </div> <input
+                class="jscolor {onFineChange:'updateColor3(this)'}" value="FFFFFF">
               <hr>
               <div class="product-price">$ 368.00</div>
               <div class="product-stock">In Stock</div>
@@ -166,12 +170,12 @@
     var scene = new THREE.Scene();
 
     //valori toneMapping
-    var toneParameters = {				
-				roughness: 1.0,				
-				exposure: 2.0,				
-				toneMapping: THREE.Uncharted2ToneMapping,
-				renderMode: "Renderer"
-		};  
+    var toneParameters = {
+      roughness: 1.0,
+      exposure: 2.0,
+      toneMapping: THREE.Uncharted2ToneMapping,
+      renderMode: "Renderer"
+    };
 
 
     //LIGHTS FOR SHADER
@@ -226,8 +230,28 @@
     }
 
     // default: red plastic
-    var materialParametersPlastic= {
+    var materialParametersPlastic1 = {
       cdiff_red: 0.7,
+      cdiff_green: 0.0,
+      cdiff_blue: 0.0,
+      cspec_red: 0.04,
+      cspec_green: 0.04,
+      cspec_blue: 0.04,
+      roughness: 0.10
+    }
+
+    var materialParametersPlastic2 = {
+      cdiff_red: 0.9,
+      cdiff_green: 0.9,
+      cdiff_blue: 0.9,
+      cspec_red: 0.04,
+      cspec_green: 0.04,
+      cspec_blue: 0.04,
+      roughness: 0.10
+    }
+
+    var materialParametersPlastic3 = {
+      cdiff_red: 0.0,
       cdiff_green: 0.0,
       cdiff_blue: 0.0,
       cspec_red: 0.04,
@@ -244,9 +268,6 @@
         texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
         texture.offset.set(0, 0);
         texture.needsUpdate = true;
-        console.log("PRIMA: " + texture.rotation);
-        texture.rotation = (1.55);
-        console.log("DOPO: " + texture.rotation);
         render();
       })
       return texture;
@@ -282,12 +303,12 @@
       'py.png', 'ny.png',
       'pz.png', 'nz.png'
     ]);
-    
+
     //CUBO
-    var geometry = new THREE.BoxGeometry( 100, 100, 100 );
-    var material = new THREE.MeshPhongMaterial( {color: 0xffffff, side: THREE.BackSide} );
-    var cube = new THREE.Mesh( geometry, material );
-    scene.add( cube );
+    var geometry = new THREE.BoxGeometry(100, 100, 100);
+    var material = new THREE.MeshPhongMaterial({ color: 0xffffff, side: THREE.BackSide });
+    var cube = new THREE.Mesh(geometry, material);
+    scene.add(cube);
 
 
     //SHADER UNIFORMS
@@ -353,7 +374,7 @@
       diffuseMap: { type: "t", value: diffuseMapWood },
       roughnessMap: { type: "t", value: roughnessMapWood },
       normalMap: { type: "t", value: normalMapWood },
-      aoMap: { type: "t", value: aoMapWood},
+      aoMap: { type: "t", value: aoMapWood },
       displacementMap: { type: "t", value: displacementMapWood },
       displacementScale: { type: "f", value: 0.0 },
       normalScale: { type: "v2", value: new THREE.Vector2(1, 1) },
@@ -376,9 +397,29 @@
       clight: { type: "v3", value: new THREE.Vector3() },
     };
 
-    var uniformsPlastic = {
+    var uniformsPlastic1 = {
       cspec: { type: "v3", value: new THREE.Vector3() },
       cdiff: { type: "v3", value: new THREE.Vector3(1.0, 0.0, 0.0) },
+      roughness: { type: "f", value: 0.5 },
+      pointLightPosition: { type: "v3", value: new THREE.Vector3() },
+      pointLightPosition1: { type: "v3", value: new THREE.Vector3() },
+      pointLightPosition2: { type: "v3", value: new THREE.Vector3() },
+      clight: { type: "v3", value: new THREE.Vector3() },
+    };
+    
+    var uniformsPlastic2 = {
+      cspec: { type: "v3", value: new THREE.Vector3() },
+      cdiff: { type: "v3", value: new THREE.Vector3(0.0, 0.0, 0.0) },
+      roughness: { type: "f", value: 0.5 },
+      pointLightPosition: { type: "v3", value: new THREE.Vector3() },
+      pointLightPosition1: { type: "v3", value: new THREE.Vector3() },
+      pointLightPosition2: { type: "v3", value: new THREE.Vector3() },
+      clight: { type: "v3", value: new THREE.Vector3() },
+    };
+    
+    var uniformsPlastic3 = {
+      cspec: { type: "v3", value: new THREE.Vector3() },
+      cdiff: { type: "v3", value: new THREE.Vector3(1.0, 1.0, 1.0) },
       roughness: { type: "f", value: 0.5 },
       pointLightPosition: { type: "v3", value: new THREE.Vector3() },
       pointLightPosition1: { type: "v3", value: new THREE.Vector3() },
@@ -412,7 +453,9 @@
     ourMaterialWood.extensions.derivatives = true;
     var ourMaterialGOLDEN = new THREE.ShaderMaterial({ uniforms: uniformsGOLDEN, vertexShader: vs, fragmentShader: fsGOLDEN });
     ourMaterialGOLDEN.extensions.derivatives = true;
-    var ourMaterialPlastic = new THREE.ShaderMaterial({ uniforms: uniformsPlastic, vertexShader: vs, fragmentShader: fsPlastic });
+    var ourMaterialPlastic1 = new THREE.ShaderMaterial({ uniforms: uniformsPlastic1, vertexShader: vs, fragmentShader: fsPlastic });
+    var ourMaterialPlastic2 = new THREE.ShaderMaterial({ uniforms: uniformsPlastic2, vertexShader: vs, fragmentShader: fsPlastic });
+    var ourMaterialPlastic3 = new THREE.ShaderMaterial({ uniforms: uniformsPlastic3, vertexShader: vs, fragmentShader: fsPlastic });
 
     //carico oggetto       
     var loader = new THREE.OBJLoader();
@@ -455,7 +498,7 @@
     var light2 = new THREE.SpotLight(0x0f4c81, 0.8, 100, Math.PI / 3, 0.9, 6);
     light2.position.set(-28.0, 15.0, 3.0);
     scene.add(light2);
-    
+
     uniformsPaint.spotLightPosition.value = light.position;
     uniformsPaint.spotLightPosition1.value = light1.position;
     uniformsPaint.spotLightPosition2.value = light2.position;
@@ -472,9 +515,17 @@
     uniformsGOLDEN.pointLightPosition1.value = light1.position;
     uniformsGOLDEN.pointLightPosition2.value = light2.position;
 
-    uniformsPlastic.pointLightPosition.value = light.position;
-    uniformsPlastic.pointLightPosition1.value = light1.position;
-    uniformsPlastic.pointLightPosition2.value = light2.position;
+    uniformsPlastic1.pointLightPosition.value = light.position;
+    uniformsPlastic1.pointLightPosition1.value = light1.position;
+    uniformsPlastic1.pointLightPosition2.value = light2.position;
+
+    uniformsPlastic2.pointLightPosition.value = light.position;
+    uniformsPlastic2.pointLightPosition1.value = light1.position;
+    uniformsPlastic2.pointLightPosition2.value = light2.position;
+
+    uniformsPlastic3.pointLightPosition.value = light.position;
+    uniformsPlastic3.pointLightPosition1.value = light1.position;
+    uniformsPlastic3.pointLightPosition2.value = light2.position;
 
     //modifico target delle luci altrimenti punta a (0, 0, 0);
     var targetObject = new THREE.Object3D();
@@ -568,17 +619,21 @@
 
       renderer.toneMapping = toneParameters.toneMapping;
 
-      ourMaterialFabric.roughness = toneParameters.roughness;   
-      ourMaterialPaint.roughness = toneParameters.roughness;  
-      ourMaterialWood.roughness = toneParameters.roughness; 
+      ourMaterialFabric.roughness = toneParameters.roughness;
+      ourMaterialPaint.roughness = toneParameters.roughness;
+      ourMaterialWood.roughness = toneParameters.roughness;
       ourMaterialGOLDEN.roughness = toneParameters.roughness;
-      ourMaterialPlastic.roughness = toneParameters.roughness;
+      ourMaterialPlastic1.roughness = toneParameters.roughness;
+      ourMaterialPlastic2.roughness = toneParameters.roughness;
+      ourMaterialPlastic3.roughness = toneParameters.roughness;
 
-      ourMaterialFabric.needsUpdate = true;   
-      ourMaterialPaint.needsUpdate = true;  
-      ourMaterialWood.needsUpdate = true; 
-      ourMaterialGOLDEN.needsUpdate = true;  
-      ourMaterialPlastic.needsUpdate = true;      
+      ourMaterialFabric.needsUpdate = true;
+      ourMaterialPaint.needsUpdate = true;
+      ourMaterialWood.needsUpdate = true;
+      ourMaterialGOLDEN.needsUpdate = true;
+      ourMaterialPlastic1.needsUpdate = true;
+      ourMaterialPlastic2.needsUpdate = true;
+      ourMaterialPlastic3.needsUpdate = true;
       renderer.toneMappingExposure = toneParameters.exposure;
 
       renderer.render(scene, camera);
@@ -691,14 +746,33 @@
         lightParameters.green * lightParameters.intensity,
         lightParameters.blue * lightParameters.intensity);
 
-      uniformsPlastic.cspec.value = new THREE.Vector3(materialParametersPlastic.cspec_red,
-        materialParametersPlastic.cspec_green, materialParametersPlastic.cspec_blue);
+      uniformsPlastic1.cspec.value = new THREE.Vector3(materialParametersPlastic1.cspec_red,
+        materialParametersPlastic1.cspec_green, materialParametersPlastic1.cspec_blue);
 
-      uniformsPlastic.roughness.value = materialParametersPlastic.roughness > 0.0 ? materialParametersPlastic.roughness : 0.01;
-      uniformsPlastic.clight.value = new THREE.Vector3(
+      uniformsPlastic1.roughness.value = materialParametersPlastic1.roughness > 0.0 ? materialParametersPlastic1.roughness : 0.01;
+      uniformsPlastic1.clight.value = new THREE.Vector3(
         lightParameters.red * lightParameters.intensity,
         lightParameters.green * lightParameters.intensity,
         lightParameters.blue * lightParameters.intensity);
+      
+      uniformsPlastic2.cspec.value = new THREE.Vector3(materialParametersPlastic2.cspec_red,
+        materialParametersPlastic2.cspec_green, materialParametersPlastic2.cspec_blue);
+      
+      uniformsPlastic2.roughness.value = materialParametersPlastic2.roughness > 0.0 ? materialParametersPlastic2.roughness : 0.01;
+      uniformsPlastic2.clight.value = new THREE.Vector3(
+        lightParameters.red * lightParameters.intensity,
+        lightParameters.green * lightParameters.intensity,
+        lightParameters.blue * lightParameters.intensity);
+
+      uniformsPlastic3.cspec.value = new THREE.Vector3(materialParametersPlastic3.cspec_red,
+        materialParametersPlastic3.cspec_green, materialParametersPlastic3.cspec_blue);
+
+      uniformsPlastic3.roughness.value = materialParametersPlastic3.roughness > 0.0 ? materialParametersPlastic3.roughness : 0.01;
+      uniformsPlastic3.clight.value = new THREE.Vector3(
+        lightParameters.red * lightParameters.intensity,
+        lightParameters.green * lightParameters.intensity,
+        lightParameters.blue * lightParameters.intensity);
+
     }
 
 
@@ -708,12 +782,34 @@
     update();
     render();
 
-    function updateColor(picker) {
+    function updateColor1(picker) {
       /*console.log(Math.round(picker.rgb[0]) + ', ' +
         Math.round(picker.rgb[1]) + ', ' +
         Math.round(picker.rgb[2]));*/
 
-      ourMaterialPlastic.uniforms.cdiff.value = new THREE.Vector3((Math.round(picker.rgb[0])) / 255,
+      ourMaterialPlastic1.uniforms.cdiff.value = new THREE.Vector3((Math.round(picker.rgb[0])) / 255,
+        (Math.round(picker.rgb[1])) / 255,
+        (Math.round(picker.rgb[2])) / 255);
+      render();
+    }
+
+    function updateColor2(picker) {
+      /*console.log(Math.round(picker.rgb[0]) + ', ' +
+        Math.round(picker.rgb[1]) + ', ' +
+        Math.round(picker.rgb[2]));*/
+
+      ourMaterialPlastic2.uniforms.cdiff.value = new THREE.Vector3((Math.round(picker.rgb[0])) / 255,
+        (Math.round(picker.rgb[1])) / 255,
+        (Math.round(picker.rgb[2])) / 255);
+      render();
+    }
+
+    function updateColor3(picker) {
+      /*console.log(Math.round(picker.rgb[0]) + ', ' +
+        Math.round(picker.rgb[1]) + ', ' +
+        Math.round(picker.rgb[2]));*/
+
+      ourMaterialPlastic3.uniforms.cdiff.value = new THREE.Vector3((Math.round(picker.rgb[0])) / 255,
         (Math.round(picker.rgb[1])) / 255,
         (Math.round(picker.rgb[2])) / 255);
       render();
@@ -726,7 +822,7 @@
             gambe.material = ourMaterialWood;
             break;
           case "l-plastic":
-            gambe.material = ourMaterialPlastic
+            gambe.material = ourMaterialPlastic1;
             break;
           case "l-golden":
             gambe.material = ourMaterialGOLDEN;
@@ -735,7 +831,7 @@
             seduta.material = ourMaterialFabric;
             break;
           case "s-plastic":
-            seduta.material = ourMaterialPlastic
+            seduta.material = ourMaterialPlastic2;
             break;
           case "s-golden":
             seduta.material = ourMaterialGOLDEN;
@@ -744,13 +840,13 @@
             struttura.material = ourMaterialPaint;
             break;
           case "st-plastic":
-            struttura.material = ourMaterialPlastic
+            struttura.material = ourMaterialPlastic3;
             break;
           case "st-golden":
             struttura.material = ourMaterialGOLDEN;
             break;
           default:
-            console.log(this);
+            //console.log(this);
             break;
         }
         render();
