@@ -22,9 +22,13 @@ Il visualizzatore è composto da una Canvas che ospita la scena 3D, la scena è 
 - Alla scena sono stati aggiunti un Piano ed un Cubo per simularne pavimento e pareti (dopo alcuni tentativi con envMap e cubeMap con risultati non soddifascenti) ai quali sono stati passati dei materiali MeshPhongMaterial di THREE.js 
 - Sono stati implementati 3 punti luce di tipo SpotLight ma per esigenze implementative in alcuni materiali (Golden e Plastic) vengono calcolate come PointLight.
 - Al modello sono state applicati diversi materiali per i quali sono stati realizzati diversi shader:
+
         1. materiale Metal Painted: texture based material che comprende le mappe per colore (diffuse), normale (o bump), roughness, ambientOcclusion, envMap (per i riflessi).
+
         2. materiale dorato: SpecularBRDF
+
         3. materiale plastico: BRDF con microfacing
+        
 
 ### Strumenti messi a disposizione
 L'utente si troverà i seguenti strumenti per interagire con il modello:
